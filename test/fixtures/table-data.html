@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Catalog</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 20px auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #f5f5f5; }
+    select { padding: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Product Catalog</h1>
+  <div>
+    <label for="category">Category:</label>
+    <select id="category" name="category">
+      <option value="all">All</option>
+      <option value="electronics">Electronics</option>
+      <option value="books">Books</option>
+      <option value="clothing">Clothing</option>
+    </select>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Category</th>
+        <th>In Stock</th>
+      </tr>
+    </thead>
+    <tbody class="product-list">
+      <tr class="product" data-id="p1">
+        <td class="name">Wireless Mouse</td>
+        <td class="price">$29.99</td>
+        <td class="category">Electronics</td>
+        <td class="stock">Yes</td>
+      </tr>
+      <tr class="product" data-id="p2">
+        <td class="name">TypeScript Handbook</td>
+        <td class="price">$39.99</td>
+        <td class="category">Books</td>
+        <td class="stock">Yes</td>
+      </tr>
+      <tr class="product" data-id="p3">
+        <td class="name">USB-C Cable</td>
+        <td class="price">$12.99</td>
+        <td class="category">Electronics</td>
+        <td class="stock">No</td>
+      </tr>
+    </tbody>
+  </table>
+  <nav aria-label="pagination">
+    <button disabled>Previous</button>
+    <span>Page 1 of 1</span>
+    <button disabled>Next</button>
+  </nav>
+</body>
+</html>

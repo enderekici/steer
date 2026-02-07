@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Results</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 20px auto; }
+    .search-box { margin-bottom: 20px; }
+    .search-box input { width: 70%; padding: 8px; }
+    .search-box button { padding: 8px 16px; }
+    .result { border-bottom: 1px solid #eee; padding: 12px 0; }
+    .result h3 { margin: 0 0 4px; }
+    .result h3 a { color: #1a0dab; text-decoration: none; }
+    .result .url { color: #006621; font-size: 14px; }
+    .result .description { color: #545454; font-size: 14px; margin-top: 4px; }
+    .pagination { margin-top: 20px; }
+    .pagination a { margin-right: 8px; padding: 4px 8px; border: 1px solid #ddd; text-decoration: none; }
+    .pagination a.active { background: #0066cc; color: white; }
+  </style>
+</head>
+<body>
+  <h1>Search</h1>
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search..." value="headless browser">
+    <button id="search-btn">Search</button>
+  </div>
+  <div id="results">
+    <div class="result" data-id="1">
+      <h3><a href="https://example.com/playwright">Playwright - Browser Automation</a></h3>
+      <div class="url">https://example.com/playwright</div>
+      <div class="description">Playwright enables reliable end-to-end testing for modern web apps.</div>
+    </div>
+    <div class="result" data-id="2">
+      <h3><a href="https://example.com/puppeteer">Puppeteer - Headless Chrome</a></h3>
+      <div class="url">https://example.com/puppeteer</div>
+      <div class="description">Puppeteer is a Node.js library for controlling headless Chrome.</div>
+    </div>
+    <div class="result" data-id="3">
+      <h3><a href="https://example.com/selenium">Selenium WebDriver</a></h3>
+      <div class="url">https://example.com/selenium</div>
+      <div class="description">Selenium automates browsers. That's it!</div>
+    </div>
+  </div>
+  <div class="pagination">
+    <a href="?page=1" class="active">1</a>
+    <a href="?page=2">2</a>
+    <a href="?page=3">3</a>
+    <a href="?page=4">Next</a>
+  </div>
+</body>
+</html>

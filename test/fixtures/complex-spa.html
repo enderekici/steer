@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; }
+    nav { background: #333; color: white; padding: 10px 20px; display: flex; gap: 16px; align-items: center; }
+    nav a { color: white; text-decoration: none; }
+    .tabs { display: flex; border-bottom: 2px solid #ddd; margin: 20px 20px 0; }
+    .tab { padding: 10px 20px; cursor: pointer; border: none; background: none; font-size: 16px; }
+    .tab.active { border-bottom: 2px solid #0066cc; color: #0066cc; }
+    .content { padding: 20px; }
+    .card { border: 1px solid #ddd; padding: 16px; margin-bottom: 12px; border-radius: 4px; }
+    .card h3 { margin-top: 0; }
+    .notification { background: #fff3cd; padding: 10px; margin: 10px 20px; border-radius: 4px; }
+    .hidden { display: none; }
+    #scroll-area { height: 300px; overflow-y: auto; border: 1px solid #ddd; margin: 20px; padding: 10px; }
+    .scroll-item { padding: 20px; border-bottom: 1px solid #eee; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" id="logo"><strong>Dashboard</strong></a>
+    <a href="/projects">Projects</a>
+    <a href="/settings">Settings</a>
+    <input type="text" placeholder="Search..." id="nav-search">
+    <button id="profile-btn">Profile</button>
+  </nav>
+
+  <div role="alert" class="notification">
+    You have 3 unread notifications.
+    <button id="dismiss-btn">Dismiss</button>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" role="tab" aria-selected="true" data-tab="overview">Overview</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="analytics">Analytics</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="reports">Reports</button>
+  </div>
+
+  <div class="content" id="tab-content">
+    <div class="card">
+      <h3>Active Projects</h3>
+      <p>You have 5 active projects.</p>
+      <a href="/projects">View all projects</a>
+    </div>
+    <div class="card">
+      <h3>Recent Activity</h3>
+      <p>Last deployment: 2 hours ago</p>
+      <button id="deploy-btn">Deploy Now</button>
+    </div>
+  </div>
+
+  <h2 style="padding: 0 20px;">Scrollable List</h2>
+  <div id="scroll-area">
+    <div class="scroll-item">Item 1 - First scrollable item</div>
+    <div class="scroll-item">Item 2 - Second scrollable item</div>
+    <div class="scroll-item">Item 3 - Third scrollable item</div>
+    <div class="scroll-item">Item 4 - Fourth scrollable item</div>
+    <div class="scroll-item">Item 5 - Fifth scrollable item</div>
+    <div class="scroll-item">Item 6 - Sixth scrollable item</div>
+    <div class="scroll-item">Item 7 - Seventh scrollable item</div>
+    <div class="scroll-item">Item 8 - Eighth scrollable item</div>
+    <div class="scroll-item">Item 9 - Ninth scrollable item</div>
+    <div class="scroll-item">Item 10 - Tenth scrollable item</div>
+  </div>
+
+  <dialog id="modal">
+    <h2>Confirm Deploy</h2>
+    <p>Are you sure you want to deploy to production?</p>
+    <button id="confirm-deploy">Confirm</button>
+    <button id="cancel-deploy">Cancel</button>
+  </dialog>
+
+  <script>
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(function(t) {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+      });
+    });
+
+    // Dismiss notification
+    document.getElementById('dismiss-btn').addEventListener('click', function() {
+      this.parentElement.classList.add('hidden');
+    });
+
+    // Deploy modal
+    document.getElementById('deploy-btn').addEventListener('click', function() {
+      document.getElementById('modal').showModal();
+    });
+    document.getElementById('cancel-deploy').addEventListener('click', function() {
+      document.getElementById('modal').close();
+    });
+    document.getElementById('confirm-deploy').addEventListener('click', function() {
+      document.getElementById('modal').close();
+      alert('Deployed!');
+    });
+  </script>
+</body>
+</html>
