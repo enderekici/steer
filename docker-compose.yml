@@ -6,6 +6,7 @@ services:
     environment:
       - ABBWAK_PORT=3000
       - ABBWAK_HEADLESS=true
+      - ABBWAK_BROWSER=firefox
       - ABBWAK_MAX_SESSIONS=10
       - ABBWAK_SESSION_TIMEOUT_MS=300000
       - ABBWAK_BLOCK_RESOURCES=image,font,media
@@ -13,6 +14,12 @@ services:
     volumes:
       - abbwak-profiles:/app/profiles
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+        reservations:
+          memory: 512m
 
 volumes:
   abbwak-profiles:

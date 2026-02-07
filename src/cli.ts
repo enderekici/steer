@@ -9,6 +9,8 @@
  *   npx abbwak --help       # Show help
  */
 
+export {};
+
 const args = process.argv.slice(2);
 
 if (args.includes("--help") || args.includes("-h")) {
@@ -27,7 +29,7 @@ Environment variables:
   ABBWAK_SESSION_TIMEOUT_MS Session idle timeout in ms (default: 300000)
   ABBWAK_REQUEST_TIMEOUT_MS Request timeout in ms (default: 30000)
   ABBWAK_HEADLESS           Run browser headless (default: true)
-  ABBWAK_BROWSER            Browser engine: chromium|firefox|webkit (default: chromium)
+  ABBWAK_BROWSER            Browser engine: chromium|firefox|webkit (default: firefox)
   ABBWAK_BLOCK_RESOURCES    Comma-separated resource types to block (default: image,font,media)
   ABBWAK_ALLOWED_DOMAINS    Comma-separated domain allowlist (default: all)
   ABBWAK_EXECUTABLE_PATH    Custom browser executable path
