@@ -34,6 +34,7 @@ export const config = {
   host: env("ABBWAK_HOST", "0.0.0.0"),
   maxSessions: envInt("ABBWAK_MAX_SESSIONS", 10),
   sessionTimeoutMs: envInt("ABBWAK_SESSION_TIMEOUT_MS", 300_000),
+  requestTimeoutMs: envInt("ABBWAK_REQUEST_TIMEOUT_MS", 30_000),
   allowedDomains: envList("ABBWAK_ALLOWED_DOMAINS", []),
   headless: envBool("ABBWAK_HEADLESS", true),
   blockResources: envList("ABBWAK_BLOCK_RESOURCES", [

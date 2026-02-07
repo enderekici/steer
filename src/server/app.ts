@@ -1,8 +1,10 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import { logger } from "../utils/logger.js";
+import { config } from "../config.js";
 import type { SessionManager } from "../browser/session-manager.js";
 import errorHandler from "./middleware/error-handler.js";
 import security from "./middleware/security.js";
+import requestTimeout from "./middleware/request-timeout.js";
 import { sessionRoutes } from "./routes/sessions.js";
 import { navigateRoutes } from "./routes/navigate.js";
 import { actRoutes } from "./routes/act.js";
@@ -29,11 +31,20 @@ export function buildApp(sessionManager: SessionManager): FastifyInstance {
   // Register middleware
   app.register(errorHandler);
   app.register(security);
+  app.register(requestTimeout);
 
   // Health check
   app.get("/health", async () => {
-    const sessions = sessionManager.listSessions();
-    return { status: "ok", sessions: sessions.length };
+    const sessionList = sessionManager.listSessions();
+    return {
+      status: "ok",
+      sessions: sessionList.length,
+      config: {
+        maxSessions: config.maxSessions,
+        sessionTimeoutMs: config.sessionTimeoutMs,
+        requestTimeoutMs: config.requestTimeoutMs,
+      },
+    };
   });
 
   // Register all route groups under /sessions prefix

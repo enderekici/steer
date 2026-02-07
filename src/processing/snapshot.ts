@@ -72,6 +72,19 @@ interface RawElement {
   description: string | undefined;
 }
 
+// ── Snapshot options ────────────────────────────────────────────────────────
+
+export type SnapshotVerbosity = "minimal" | "normal" | "detailed";
+
+export interface SnapshotOptions {
+  /** Restrict snapshot to elements within this CSS selector scope. */
+  scope?: string;
+  /** Controls how much information is returned per element. */
+  verbosity?: SnapshotVerbosity;
+  /** Maximum number of refs to return (for pagination on large pages). */
+  maxRefs?: number;
+}
+
 // ── Main entry point ────────────────────────────────────────────────────────
 
 /**
@@ -92,11 +105,15 @@ interface RawElement {
  */
 export async function takeSnapshot(
   page: Page,
+  options: SnapshotOptions = {},
 ): Promise<{ snapshot: PageSnapshot; refMap: Map<string, ElementHandle> }> {
   const [url, title] = await Promise.all([
     Promise.resolve(page.url()),
     page.title().catch(() => ""),
   ]);
+
+  const verbosity = options.verbosity ?? "normal";
+  const maxRefs = options.maxRefs ?? 0; // 0 = unlimited
 
   // ── 1. Collect element data inside the browser ────────────────────────
 
@@ -114,11 +131,15 @@ export async function takeSnapshot(
       meaningfulSel,
       dataAttr,
       maxLen,
+      scopeSelector,
+      maxRefsLimit,
     }: {
       interactiveSel: string;
       meaningfulSel: string;
       dataAttr: string;
       maxLen: number;
+      scopeSelector: string;
+      maxRefsLimit: number;
     }) => {
       // -- helpers (run inside the browser) --------------------------------
 
@@ -143,10 +164,7 @@ export async function takeSnapshot(
         if (style.visibility === "hidden") return true;
         if (style.opacity === "0") return true;
 
-        // Zero-size and not a special positioned element.
         if (el.offsetWidth === 0 && el.offsetHeight === 0) {
-          // Some screen-reader-only patterns use 0x0 with clip; allow
-          // those only when they carry an explicit ARIA role.
           if (!el.getAttribute("role")) return true;
         }
 
@@ -220,7 +238,6 @@ export async function takeSnapshot(
       const getAccessibleName = (el: Element): string => {
         if (!(el instanceof HTMLElement)) return "";
 
-        // 1. aria-labelledby (highest priority)
         const labelledBy = el.getAttribute("aria-labelledby");
         if (labelledBy) {
           const parts = labelledBy
@@ -233,24 +250,20 @@ export async function takeSnapshot(
           if (parts.length > 0) return parts.join(" ");
         }
 
-        // 2. aria-label
         const ariaLabel = el.getAttribute("aria-label");
         if (ariaLabel?.trim()) return ariaLabel.trim();
 
-        // 3. <label> association (for form controls)
         if (
           el instanceof HTMLInputElement ||
           el instanceof HTMLTextAreaElement ||
           el instanceof HTMLSelectElement
         ) {
-          // Explicit: <label for="...">
           if (el.id) {
             const label = document.querySelector(
               `label[for="${CSS.escape(el.id)}"]`,
             );
             if (label?.textContent?.trim()) return label.textContent.trim();
           }
-          // Implicit: ancestor <label>
           const parentLabel = el.closest("label");
           if (parentLabel) {
             const clone = parentLabel.cloneNode(true) as HTMLElement;
@@ -264,7 +277,6 @@ export async function takeSnapshot(
           }
         }
 
-        // 4. alt (images, input[type=image])
         if (el instanceof HTMLImageElement && el.alt) return el.alt;
         if (
           el instanceof HTMLInputElement &&
@@ -273,11 +285,9 @@ export async function takeSnapshot(
         )
           return el.alt;
 
-        // 5. title attribute
         const titleAttr = el.getAttribute("title");
         if (titleAttr?.trim()) return titleAttr.trim();
 
-        // 6. placeholder (inputs, textareas)
         if (
           (el instanceof HTMLInputElement ||
             el instanceof HTMLTextAreaElement) &&
@@ -285,33 +295,14 @@ export async function takeSnapshot(
         )
           return el.placeholder.trim();
 
-        // 7. Direct text content for buttons, links, headings, etc.
         const tag = el.tagName.toLowerCase();
         const role = el.getAttribute("role") ?? "";
         const textContentRoles = new Set([
-          "button",
-          "link",
-          "tab",
-          "menuitem",
-          "menuitemcheckbox",
-          "menuitemradio",
-          "treeitem",
-          "heading",
-          "option",
-          "alert",
-          "status",
+          "button", "link", "tab", "menuitem", "menuitemcheckbox",
+          "menuitemradio", "treeitem", "heading", "option", "alert", "status",
         ]);
         const textContentTags = new Set([
-          "button",
-          "a",
-          "summary",
-          "h1",
-          "h2",
-          "h3",
-          "h4",
-          "h5",
-          "h6",
-          "option",
+          "button", "a", "summary", "h1", "h2", "h3", "h4", "h5", "h6", "option",
         ]);
 
         if (textContentRoles.has(role) || textContentTags.has(tag)) {
@@ -319,7 +310,6 @@ export async function takeSnapshot(
           if (text) return text;
         }
 
-        // 8. value for submit/reset/button inputs
         if (el instanceof HTMLInputElement) {
           const t = el.type.toLowerCase();
           if ((t === "submit" || t === "reset" || t === "button") && el.value) {
@@ -333,9 +323,7 @@ export async function takeSnapshot(
       const getElementValue = (el: Element): string | undefined => {
         if (el instanceof HTMLInputElement) {
           const type = el.type.toLowerCase();
-          // Checked state is captured separately.
           if (type === "checkbox" || type === "radio") return undefined;
-          // Don't leak passwords.
           if (type === "password") return el.value ? "••••" : "";
           return el.value;
         }
@@ -362,6 +350,11 @@ export async function takeSnapshot(
 
       // -- main collection logic -------------------------------------------
 
+      // Determine the root element to search within
+      const root = scopeSelector
+        ? document.querySelector(scopeSelector) ?? document
+        : document;
+
       // Clear previous ref markers.
       for (const old of document.querySelectorAll(`[${dataAttr}]`)) {
         old.removeAttribute(dataAttr);
@@ -382,13 +375,16 @@ export async function takeSnapshot(
       }> = [];
 
       const allSel = `${interactiveSel},${meaningfulSel}`;
-      const candidates = document.querySelectorAll(allSel);
+      const candidates = root.querySelectorAll(allSel);
 
       let refCounter = 0;
 
       for (const el of candidates) {
         if (seen.has(el)) continue;
         seen.add(el);
+
+        // Enforce maxRefs limit
+        if (maxRefsLimit > 0 && refCounter >= maxRefsLimit) break;
 
         // Skip hidden elements.
         if (isAncestorHidden(el)) continue;
@@ -483,6 +479,8 @@ export async function takeSnapshot(
       meaningfulSel: MEANINGFUL_SELECTORS,
       dataAttr: DATA_ATTR,
       maxLen: MAX_TEXT_LENGTH,
+      scopeSelector: options.scope ?? "",
+      maxRefsLimit: maxRefs,
     },
   );
 
@@ -498,25 +496,29 @@ export async function takeSnapshot(
       name: raw.name,
     };
 
-    // Only include optional fields when they carry information.
-    if (raw.value !== undefined) refEl.value = raw.value;
-    if (raw.disabled) refEl.disabled = true;
-    if (raw.checked !== undefined) refEl.checked = raw.checked;
-    if (raw.expanded !== undefined) refEl.expanded = raw.expanded;
-    if (raw.options && raw.options.length > 0) refEl.options = raw.options;
-    if (raw.description) refEl.description = raw.description;
+    // Verbosity filtering
+    if (verbosity !== "minimal") {
+      if (raw.value !== undefined) refEl.value = raw.value;
+      if (raw.disabled) refEl.disabled = true;
+      if (raw.checked !== undefined) refEl.checked = raw.checked;
+      if (raw.expanded !== undefined) refEl.expanded = raw.expanded;
+    }
+
+    if (verbosity === "detailed") {
+      if (raw.options && raw.options.length > 0) refEl.options = raw.options;
+      if (raw.description) refEl.description = raw.description;
+    } else if (verbosity === "normal") {
+      if (raw.options && raw.options.length > 0) refEl.options = raw.options;
+    }
 
     refs.push(refEl);
 
-    // Resolve the live ElementHandle via the data attribute we stamped
-    // during the evaluate() call.
     try {
       const handle = await page.$(`[${DATA_ATTR}="${raw.refId}"]`);
       if (handle) {
         refMap.set(raw.refId, handle);
       }
     } catch {
-      // Element may have been detached between evaluate() and $().
       logger.debug(
         { ref: raw.refId },
         "Could not resolve ElementHandle for ref",
@@ -525,7 +527,7 @@ export async function takeSnapshot(
   }
 
   logger.debug(
-    { url, elementCount: refs.length },
+    { url, elementCount: refs.length, verbosity, scope: options.scope },
     "Snapshot captured",
   );
 
@@ -537,18 +539,6 @@ export async function takeSnapshot(
 
 /**
  * Render a human/agent-readable text representation of the snapshot.
- *
- * Example output:
- * ```
- * Page: Sign in to GitHub
- * URL:  https://github.com/login
- *
- * [r1] heading "Sign in to GitHub"
- * [r2] textbox "Username or email address" value=""
- * [r3] textbox "Password" value=""
- * [r4] link "Forgot password?"
- * [r5] button "Sign in"
- * ```
  */
 export function formatSnapshot(snapshot: PageSnapshot): string {
   const lines: string[] = [

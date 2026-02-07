@@ -160,7 +160,11 @@ export class McpBrowserServer {
   ): Promise<ToolResponse> {
     const session = await this.ensureSession(args.sessionId as string | undefined);
 
-    const { snapshot, refMap } = await takeSnapshot(session.page);
+    const { snapshot, refMap } = await takeSnapshot(session.page, {
+      scope: args.scope as string | undefined,
+      verbosity: (args.verbosity as "minimal" | "normal" | "detailed") ?? "normal",
+      maxRefs: args.maxRefs as number | undefined,
+    });
 
     // Update session refs so subsequent act calls can resolve ref IDs.
     session.refs.clear();

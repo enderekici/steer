@@ -1,16 +1,17 @@
 {
   "name": "abbwak",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "API-Based Browser Without API Key — A free, self-hosted headless browser for AI agents",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "src/index.ts",
   "bin": {
-    "abbwak": "dist/index.js"
+    "abbwak": "src/cli.ts"
   },
   "scripts": {
     "dev": "tsx src/index.ts",
-    "build": "tsup src/index.ts --format esm --dts --clean",
-    "start": "node dist/index.js",
+    "start": "tsx src/index.ts",
+    "mcp": "tsx src/mcp/server.ts",
+    "build": "tsup src/index.ts src/cli.ts src/mcp/server.ts --format esm --dts --clean",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
@@ -18,7 +19,7 @@
     "lint:fix": "biome check --write src test",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": ["browser", "agent", "headless", "automation", "mcp", "ai"],
+  "keywords": ["browser", "agent", "headless", "automation", "mcp", "ai", "playwright"],
   "license": "MIT",
   "engines": {
     "node": ">=20.0.0"

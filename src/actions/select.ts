@@ -4,31 +4,8 @@ import type { ActionTarget, ActionResult } from "./types.js";
 import { ActionError } from "../utils/errors.js";
 import { sanitizeSelector } from "../utils/sanitize.js";
 import { takeSnapshot } from "../processing/snapshot.js";
+import { resolveElement } from "./resolve.js";
 import { logger } from "../utils/logger.js";
-
-async function resolveElement(
-  session: Session,
-  target: ActionTarget,
-): Promise<ElementHandle> {
-  let element: ElementHandle | null | undefined;
-
-  if (target.ref) {
-    element = session.getElementByRef(target.ref);
-    if (!element) {
-      throw new ActionError("select", `Element ref "${target.ref}" not found in current snapshot`);
-    }
-  } else if (target.selector) {
-    const safe = sanitizeSelector(target.selector);
-    element = await session.page.$(safe);
-    if (!element) {
-      throw new ActionError("select", `No element matches selector "${safe}"`);
-    }
-  } else {
-    throw new ActionError("select", "Either ref or selector must be provided");
-  }
-
-  return element;
-}
 
 async function isNativeSelect(element: ElementHandle): Promise<boolean> {
   return element.evaluate(
@@ -40,19 +17,16 @@ async function getEffectiveSelector(
   target: ActionTarget,
   element: ElementHandle,
 ): Promise<string> {
-  // If we already have a CSS selector, use it directly
   if (target.selector) {
     return sanitizeSelector(target.selector);
   }
 
-  // Generate a selector from the element for use with page.selectOption()
   const generated: string = await element.evaluate((node) => {
     const el = node as unknown as Element;
     if (el.id) return `#${el.id}`;
     if (el.getAttribute("name")) {
       return `${el.tagName.toLowerCase()}[name="${el.getAttribute("name")}"]`;
     }
-    // Fallback: walk up and build a path
     const path: string[] = [];
     let current: Element | null = el;
     while (current && current !== document.body) {
@@ -86,30 +60,24 @@ export async function executeSelect(
   target: ActionTarget,
   value: string,
 ): Promise<ActionResult> {
-  const element = await resolveElement(session, target);
+  const element = await resolveElement(session, target, "select");
 
   try {
     const isNative = await isNativeSelect(element);
 
     if (isNative) {
-      // Use Playwright's built-in selectOption for native <select> elements
       const selector = await getEffectiveSelector(target, element);
       await session.page.selectOption(selector, value);
     } else {
-      // Custom dropdown: click to open, then find and click the matching option
       logger.info(
         { sessionId: session.id, value },
         "Handling custom dropdown select",
       );
 
-      // Click the dropdown trigger to open it
       await element.scrollIntoViewIfNeeded().catch(() => {});
       await element.click({ timeout: 5000 });
-
-      // Brief wait for dropdown animation / rendering
       await session.page.waitForTimeout(300);
 
-      // Look for an option matching the value -- try several common patterns
       const optionSelectors = [
         `[role="option"]:has-text("${value}")`,
         `[role="listbox"] >> text="${value}"`,
@@ -140,7 +108,6 @@ export async function executeSelect(
       }
     }
 
-    // Wait briefly for any side-effects (navigation, re-render)
     await session.page
       .waitForLoadState("domcontentloaded", { timeout: 3000 })
       .catch(() => {});
@@ -150,7 +117,6 @@ export async function executeSelect(
     throw new ActionError("select", message);
   }
 
-  // Take a fresh snapshot and update session refs
   const { snapshot, refMap } = await takeSnapshot(session.page);
 
   session.refs.clear();
@@ -160,9 +126,5 @@ export async function executeSelect(
 
   session.touch();
 
-  return {
-    success: true,
-    snapshot,
-    url: session.page.url(),
-  };
+  return { success: true, snapshot, url: session.page.url() };
 }

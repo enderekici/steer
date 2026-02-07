@@ -110,6 +110,22 @@ export const TOOLS = [
     inputSchema: {
       type: "object" as const,
       properties: {
+        scope: {
+          type: "string",
+          description:
+            'CSS selector to restrict the snapshot to a specific part of the page (e.g. "#main", "form.login"). Reduces token usage on large pages.',
+        },
+        verbosity: {
+          type: "string",
+          enum: ["minimal", "normal", "detailed"],
+          description:
+            'Controls output detail. "minimal" = ref+role+name only, "normal" (default) = adds value/disabled/checked/options, "detailed" = adds descriptions.',
+        },
+        maxRefs: {
+          type: "number",
+          description:
+            "Maximum number of elements to return. Use to limit output on pages with many interactive elements.",
+        },
         sessionId: {
           type: "string",
           description:
