@@ -72,6 +72,13 @@ export class Session {
 
     const page = await context.newPage();
 
+    // tsx/esbuild with keepNames:true wraps const assignments inside
+    // page.evaluate() with __name(), which doesn't exist in the browser.
+    // Inject a global shim so it becomes a harmless no-op.
+    await context.addInitScript(
+      "if(typeof __name==='undefined'){var __name=(t,v)=>(Object.defineProperty(t,'name',{value:v,configurable:true}),t)}",
+    );
+
     const blockResources = options.blockResources ?? config.blockResources;
 
     if (blockResources.length > 0) {

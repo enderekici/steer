@@ -100,6 +100,14 @@ export async function takeSnapshot(
 
   // ── 1. Collect element data inside the browser ────────────────────────
 
+  // tsx/esbuild with keepNames:true wraps const declarations with __name()
+  // at module scope. When Playwright serialises the evaluate callback, those
+  // references become unresolvable in the browser.  Inject a global shim so
+  // they become harmless no-ops.  Using a string avoids the same transform.
+  await page.evaluate(
+    "if(typeof __name==='undefined'){var __name=function(t,v){Object.defineProperty(t,'name',{value:v,configurable:true});return t}}",
+  );
+
   const rawElements: RawElement[] = await page.evaluate(
     ({
       interactiveSel,
