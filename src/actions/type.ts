@@ -1,15 +1,13 @@
-import type { ElementHandle } from "playwright";
-import type { Session } from "../browser/session.js";
-import type { ActionTarget, ActionResult } from "./types.js";
-import { ActionError } from "../utils/errors.js";
-import { takeSnapshot } from "../processing/snapshot.js";
-import { resolveElement, withRetry } from "./resolve.js";
-import { logger } from "../utils/logger.js";
+import type { ElementHandle } from 'playwright';
+import type { Session } from '../browser/session.js';
+import { takeSnapshot } from '../processing/snapshot.js';
+import { ActionError } from '../utils/errors.js';
+import { logger } from '../utils/logger.js';
+import { resolveElement, withRetry } from './resolve.js';
+import type { ActionResult, ActionTarget } from './types.js';
 
 async function isContentEditable(element: ElementHandle): Promise<boolean> {
-  return element.evaluate(
-    (el) => (el as HTMLElement).isContentEditable ?? false,
-  );
+  return element.evaluate((el) => (el as HTMLElement).isContentEditable ?? false);
 }
 
 export async function executeType(
@@ -17,7 +15,7 @@ export async function executeType(
   target: ActionTarget,
   value: string,
 ): Promise<ActionResult> {
-  const element = await resolveElement(session, target, "type");
+  const element = await resolveElement(session, target, 'type');
 
   try {
     await withRetry(
@@ -35,7 +33,7 @@ export async function executeType(
             sel?.removeAllRanges();
             sel?.addRange(range);
           });
-          await session.page.keyboard.press("Delete");
+          await session.page.keyboard.press('Delete');
           await element.type(value);
         } else {
           try {
@@ -43,20 +41,20 @@ export async function executeType(
           } catch {
             logger.warn(
               { sessionId: session.id },
-              "fill() failed, falling back to triple-click + type",
+              'fill() failed, falling back to triple-click + type',
             );
             await element.click({ clickCount: 3 });
-            await session.page.keyboard.press("Delete");
+            await session.page.keyboard.press('Delete');
             await element.type(value);
           }
         }
       },
-      { retries: 1, actionName: "type" },
+      { retries: 1, actionName: 'type' },
     );
   } catch (err) {
     if (err instanceof ActionError) throw err;
     const message = err instanceof Error ? err.message : String(err);
-    throw new ActionError("type", message);
+    throw new ActionError('type', message);
   }
 
   const { snapshot, refMap } = await takeSnapshot(session.page);

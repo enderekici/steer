@@ -1,5 +1,5 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { takeSnapshot, type SnapshotVerbosity } from "../../processing/snapshot.js";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { type SnapshotVerbosity, takeSnapshot } from '../../processing/snapshot.js';
 
 interface SessionParams {
   id: string;
@@ -16,25 +16,25 @@ export async function observeRoutes(fastify: FastifyInstance): Promise<void> {
 
   // GET /sessions/:id/observe
   fastify.get<{ Params: SessionParams; Querystring: ObserveQuery }>(
-    "/:id/observe",
+    '/:id/observe',
     {
       schema: {
         params: {
-          type: "object",
+          type: 'object',
           properties: {
-            id: { type: "string" },
+            id: { type: 'string' },
           },
-          required: ["id"],
+          required: ['id'],
         },
         querystring: {
-          type: "object",
+          type: 'object',
           properties: {
-            scope: { type: "string" },
+            scope: { type: 'string' },
             verbosity: {
-              type: "string",
-              enum: ["minimal", "normal", "detailed"],
+              type: 'string',
+              enum: ['minimal', 'normal', 'detailed'],
             },
-            maxRefs: { type: "integer", minimum: 1 },
+            maxRefs: { type: 'integer', minimum: 1 },
           },
           additionalProperties: false,
         },

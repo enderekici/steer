@@ -10,6 +10,18 @@
       }
     }
   },
+  "overrides": [
+    {
+      "include": ["test/**/*.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    }
+  ],
   "formatter": {
     "enabled": true,
     "indentStyle": "space",

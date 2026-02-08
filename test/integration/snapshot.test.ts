@@ -1,10 +1,10 @@
-process.env.PLAYWRIGHT_BROWSERS_PATH = process.env.HOME + '/.cache/ms-playwright';
+process.env.PLAYWRIGHT_BROWSERS_PATH = `${process.env.HOME}/.cache/ms-playwright`;
 process.env.ABBWAK_LOG_LEVEL = 'silent';
 
 import path from 'node:path';
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
-import { takeSnapshot, formatSnapshot } from '../../src/processing/snapshot.js';
+import { type Browser, type BrowserContext, type Page, chromium } from 'playwright';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { formatSnapshot, takeSnapshot } from '../../src/processing/snapshot.js';
 
 const FIXTURES_DIR = path.resolve('test/fixtures');
 const loginFormUrl = `file://${path.join(FIXTURES_DIR, 'login-form.html')}`;
@@ -12,7 +12,8 @@ const complexSpaUrl = `file://${path.join(FIXTURES_DIR, 'complex-spa.html')}`;
 const searchResultsUrl = `file://${path.join(FIXTURES_DIR, 'search-results.html')}`;
 const tableDataUrl = `file://${path.join(FIXTURES_DIR, 'table-data.html')}`;
 
-const CHROME_PATH = process.env.CHROME_PATH || '/root/.cache/ms-playwright/chromium-1194/chrome-linux/chrome';
+const CHROME_PATH =
+  process.env.CHROME_PATH || '/root/.cache/ms-playwright/chromium-1194/chrome-linux/chrome';
 
 let browser: Browser;
 let ctx: BrowserContext;
@@ -48,43 +49,33 @@ describe('takeSnapshot on login-form.html', () => {
 
   it('should find the h1 heading element', async () => {
     const { snapshot } = await takeSnapshot(page);
-    const heading = snapshot.refs.find(
-      (r) => r.role === 'heading' && r.name.includes('Sign In'),
-    );
+    const heading = snapshot.refs.find((r) => r.role === 'heading' && r.name.includes('Sign In'));
     expect(heading).toBeDefined();
   });
 
   it('should find the username text input', async () => {
     const { snapshot } = await takeSnapshot(page);
-    const username = snapshot.refs.find(
-      (r) => r.role === 'textbox' && r.name === 'Username',
-    );
+    const username = snapshot.refs.find((r) => r.role === 'textbox' && r.name === 'Username');
     expect(username).toBeDefined();
-    expect(username!.value).toBeDefined();
+    expect(username?.value).toBeDefined();
   });
 
   it('should find the password input as textbox', async () => {
     const { snapshot } = await takeSnapshot(page);
-    const password = snapshot.refs.find(
-      (r) => r.role === 'textbox' && r.name === 'Password',
-    );
+    const password = snapshot.refs.find((r) => r.role === 'textbox' && r.name === 'Password');
     expect(password).toBeDefined();
   });
 
   it('should find the remember checkbox', async () => {
     const { snapshot } = await takeSnapshot(page);
-    const checkbox = snapshot.refs.find(
-      (r) => r.role === 'checkbox' && r.name === 'Remember me',
-    );
+    const checkbox = snapshot.refs.find((r) => r.role === 'checkbox' && r.name === 'Remember me');
     expect(checkbox).toBeDefined();
-    expect(checkbox!.checked).toBe(false);
+    expect(checkbox?.checked).toBe(false);
   });
 
   it('should find the Sign In button', async () => {
     const { snapshot } = await takeSnapshot(page);
-    const btn = snapshot.refs.find(
-      (r) => r.role === 'button' && r.name === 'Sign In',
-    );
+    const btn = snapshot.refs.find((r) => r.role === 'button' && r.name === 'Sign In');
     expect(btn).toBeDefined();
   });
 
@@ -133,7 +124,7 @@ describe('takeSnapshot on complex-spa.html', () => {
     const { snapshot } = await takeSnapshot(page);
     const alert = snapshot.refs.find((r) => r.role === 'alert');
     expect(alert).toBeDefined();
-    expect(alert!.name).toContain('unread notifications');
+    expect(alert?.name).toContain('unread notifications');
   });
 
   it('should find nav links', async () => {
@@ -156,9 +147,7 @@ describe('takeSnapshot on complex-spa.html', () => {
 
   it('should find the nav-search input', async () => {
     const { snapshot } = await takeSnapshot(page);
-    const searchInput = snapshot.refs.find(
-      (r) => r.role === 'textbox' && r.name === 'Search...',
-    );
+    const searchInput = snapshot.refs.find((r) => r.role === 'textbox' && r.name === 'Search...');
     expect(searchInput).toBeDefined();
   });
 

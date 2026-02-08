@@ -1,12 +1,6 @@
-import {
-  chromium,
-  firefox,
-  webkit,
-  type Browser,
-  type BrowserType,
-} from "playwright";
-import { config } from "../config.js";
-import { logger } from "../utils/logger.js";
+import { type Browser, type BrowserType, chromium, firefox, webkit } from 'playwright';
+import { config } from '../config.js';
+import { logger } from '../utils/logger.js';
 
 const browserTypes: Record<string, BrowserType> = {
   chromium,
@@ -26,7 +20,7 @@ export class BrowserEngine {
     } = {},
   ): Promise<void> {
     if (this.browser) {
-      logger.warn("Browser already launched, closing existing instance");
+      logger.warn('Browser already launched, closing existing instance');
       await this.close();
     }
 
@@ -40,50 +34,44 @@ export class BrowserEngine {
 
     // Point Playwright to the cached browser binaries
     process.env.PLAYWRIGHT_BROWSERS_PATH =
-      process.env.PLAYWRIGHT_BROWSERS_PATH ??
-      `${process.env.HOME}/.cache/ms-playwright`;
+      process.env.PLAYWRIGHT_BROWSERS_PATH ?? `${process.env.HOME}/.cache/ms-playwright`;
 
-    logger.info(
-      { browser: browserName, headless },
-      "Launching browser",
-    );
+    logger.info({ browser: browserName, headless }, 'Launching browser');
 
     const executablePath = process.env.ABBWAK_EXECUTABLE_PATH || undefined;
 
     this.browser = await browserType.launch({
       headless,
       executablePath,
-      args: ["--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage"],
+      args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
     });
 
-    this.browser.on("disconnected", () => {
-      logger.warn("Browser disconnected unexpectedly");
+    this.browser.on('disconnected', () => {
+      logger.warn('Browser disconnected unexpectedly');
       this.browser = null;
     });
 
-    logger.info({ browser: browserName }, "Browser launched successfully");
+    logger.info({ browser: browserName }, 'Browser launched successfully');
   }
 
   getBrowser(): Browser {
     if (!this.browser) {
-      throw new Error(
-        "Browser not launched. Call launch() before accessing the browser.",
-      );
+      throw new Error('Browser not launched. Call launch() before accessing the browser.');
     }
     return this.browser;
   }
 
   isRunning(): boolean {
-    return this.browser !== null && this.browser.isConnected();
+    return this.browser?.isConnected();
   }
 
   async close(): Promise<void> {
     if (this.browser) {
-      logger.info("Closing browser");
+      logger.info('Closing browser');
       try {
         await this.browser.close();
       } catch (err) {
-        logger.error({ err }, "Error closing browser");
+        logger.error({ err }, 'Error closing browser');
       } finally {
         this.browser = null;
       }

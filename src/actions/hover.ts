@@ -1,14 +1,11 @@
-import type { Session } from "../browser/session.js";
-import type { ActionTarget, ActionResult } from "./types.js";
-import { ActionError } from "../utils/errors.js";
-import { takeSnapshot } from "../processing/snapshot.js";
-import { resolveElement } from "./resolve.js";
+import type { Session } from '../browser/session.js';
+import { takeSnapshot } from '../processing/snapshot.js';
+import { ActionError } from '../utils/errors.js';
+import { resolveElement } from './resolve.js';
+import type { ActionResult, ActionTarget } from './types.js';
 
-export async function executeHover(
-  session: Session,
-  target: ActionTarget,
-): Promise<ActionResult> {
-  const element = await resolveElement(session, target, "hover");
+export async function executeHover(session: Session, target: ActionTarget): Promise<ActionResult> {
+  const element = await resolveElement(session, target, 'hover');
 
   try {
     await element.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {});
@@ -19,7 +16,7 @@ export async function executeHover(
   } catch (err) {
     if (err instanceof ActionError) throw err;
     const message = err instanceof Error ? err.message : String(err);
-    throw new ActionError("hover", message);
+    throw new ActionError('hover', message);
   }
 
   const { snapshot, refMap } = await takeSnapshot(session.page);

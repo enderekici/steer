@@ -1,10 +1,10 @@
-import type { Session } from "../browser/session.js";
-import type { ActionResult } from "./types.js";
-import { takeSnapshot } from "../processing/snapshot.js";
-import type { Dialog } from "playwright";
+import type { Dialog } from 'playwright';
+import type { Session } from '../browser/session.js';
+import { takeSnapshot } from '../processing/snapshot.js';
+import type { ActionResult } from './types.js';
 
 export interface DialogConfig {
-  action: "accept" | "dismiss";
+  action: 'accept' | 'dismiss';
   promptText?: string;
 }
 
@@ -15,18 +15,18 @@ export interface DialogConfig {
  */
 export function installDialogHandler(
   session: Session,
-  config: DialogConfig = { action: "accept" },
+  config: DialogConfig = { action: 'accept' },
 ): void {
   // Store config on session for later reference
   (session as SessionWithDialog).dialogConfig = config;
 
   // Remove any existing handler first
-  session.page.removeAllListeners("dialog");
+  session.page.removeAllListeners('dialog');
 
-  session.page.on("dialog", async (dialog: Dialog) => {
-    const cfg = (session as SessionWithDialog).dialogConfig ?? { action: "accept" };
+  session.page.on('dialog', async (dialog: Dialog) => {
+    const cfg = (session as SessionWithDialog).dialogConfig ?? { action: 'accept' };
 
-    if (cfg.action === "accept") {
+    if (cfg.action === 'accept') {
       await dialog.accept(cfg.promptText);
     } else {
       await dialog.dismiss();

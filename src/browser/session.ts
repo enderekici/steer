@@ -1,12 +1,7 @@
-import type {
-  Browser,
-  BrowserContext,
-  Page,
-  ElementHandle,
-} from "playwright";
-import { nanoid } from "nanoid";
-import { config } from "../config.js";
-import { logger } from "../utils/logger.js";
+import { nanoid } from 'nanoid';
+import type { Browser, BrowserContext, ElementHandle, Page } from 'playwright';
+import { config } from '../config.js';
+import { logger } from '../utils/logger.js';
 
 export interface RefElement {
   ref: string;
@@ -41,12 +36,7 @@ export class Session {
   lastActivity: number;
   profileName?: string;
 
-  private constructor(
-    id: string,
-    context: BrowserContext,
-    page: Page,
-    profileName?: string,
-  ) {
+  private constructor(id: string, context: BrowserContext, page: Page, profileName?: string) {
     this.id = id;
     this.context = context;
     this.page = page;
@@ -55,10 +45,7 @@ export class Session {
     this.profileName = profileName;
   }
 
-  static async create(
-    browser: Browser,
-    options: SessionCreateOptions = {},
-  ): Promise<Session> {
+  static async create(browser: Browser, options: SessionCreateOptions = {}): Promise<Session> {
     const id = nanoid();
     const viewport = options.viewport ?? {
       width: config.viewportWidth,
@@ -82,7 +69,7 @@ export class Session {
     const blockResources = options.blockResources ?? config.blockResources;
 
     if (blockResources.length > 0) {
-      await context.route("**/*", (route) => {
+      await context.route('**/*', (route) => {
         const resourceType = route.request().resourceType();
         if (blockResources.includes(resourceType)) {
           return route.abort();
@@ -91,10 +78,7 @@ export class Session {
       });
     }
 
-    logger.info(
-      { sessionId: id, viewport, blockResources },
-      "Session created",
-    );
+    logger.info({ sessionId: id, viewport, blockResources }, 'Session created');
 
     return new Session(id, context, page, options.profileName);
   }
@@ -112,11 +96,11 @@ export class Session {
   }
 
   async close(): Promise<void> {
-    logger.info({ sessionId: this.id }, "Closing session");
+    logger.info({ sessionId: this.id }, 'Closing session');
     try {
       await this.context.close();
     } catch (err) {
-      logger.error({ sessionId: this.id, err }, "Error closing session context");
+      logger.error({ sessionId: this.id, err }, 'Error closing session context');
     }
   }
 }

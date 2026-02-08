@@ -1,9 +1,9 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { executeNavigate } from "../../actions/index.js";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { executeNavigate } from '../../actions/index.js';
 
 interface NavigateBody {
   url: string;
-  waitUntil?: "load" | "domcontentloaded" | "networkidle";
+  waitUntil?: 'load' | 'domcontentloaded' | 'networkidle';
 }
 
 interface SessionParams {
@@ -15,26 +15,26 @@ export async function navigateRoutes(fastify: FastifyInstance): Promise<void> {
 
   // POST /sessions/:id/navigate
   fastify.post<{ Params: SessionParams; Body: NavigateBody }>(
-    "/:id/navigate",
+    '/:id/navigate',
     {
       schema: {
         params: {
-          type: "object",
+          type: 'object',
           properties: {
-            id: { type: "string" },
+            id: { type: 'string' },
           },
-          required: ["id"],
+          required: ['id'],
         },
         body: {
-          type: "object",
+          type: 'object',
           properties: {
-            url: { type: "string" },
+            url: { type: 'string' },
             waitUntil: {
-              type: "string",
-              enum: ["load", "domcontentloaded", "networkidle"],
+              type: 'string',
+              enum: ['load', 'domcontentloaded', 'networkidle'],
             },
           },
-          required: ["url"],
+          required: ['url'],
           additionalProperties: false,
         },
       },

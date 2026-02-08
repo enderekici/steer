@@ -13,8 +13,9 @@ export {};
 
 const args = process.argv.slice(2);
 
-if (args.includes("--help") || args.includes("-h")) {
-  console.log(`
+if (args.includes('--help') || args.includes('-h')) {
+  console.log(
+    `
 abbwak — API-Based Browser Without API Key
 
 Usage:
@@ -44,15 +45,16 @@ MCP setup (Claude Desktop / claude_desktop_config.json):
       }
     }
   }
-`.trim());
+`.trim(),
+  );
   process.exit(0);
 }
 
-if (args.includes("--mcp")) {
+if (args.includes('--mcp')) {
   // MCP mode: import and start the MCP server
-  const { startMcpServer } = await import("./mcp/server.js");
+  const { startMcpServer } = await import('./mcp/server.js');
   await startMcpServer();
 } else {
   // REST API mode: import and run the HTTP server
-  await import("./index.js");
+  await import('./index.js');
 }

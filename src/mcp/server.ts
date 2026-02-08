@@ -5,23 +5,20 @@
  * Run standalone:  npx tsx src/mcp/server.ts
  */
 
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
-import { BrowserEngine } from "../browser/engine.js";
-import { SessionManager } from "../browser/session-manager.js";
-import type { Session } from "../browser/session.js";
-import { executeAction, executeNavigate } from "../actions/index.js";
-import type { ActionTarget } from "../actions/index.js";
-import { takeSnapshot, formatSnapshot } from "../processing/snapshot.js";
-import { extractContent } from "../processing/content.js";
-import type { ExtractOptions } from "../processing/content.js";
-import { logger } from "../utils/logger.js";
-import { TOOLS } from "./tools.js";
+import { executeAction, executeNavigate } from '../actions/index.js';
+import type { ActionTarget } from '../actions/index.js';
+import { BrowserEngine } from '../browser/engine.js';
+import { SessionManager } from '../browser/session-manager.js';
+import type { Session } from '../browser/session.js';
+import { extractContent } from '../processing/content.js';
+import type { ExtractOptions } from '../processing/content.js';
+import { formatSnapshot, takeSnapshot } from '../processing/snapshot.js';
+import { logger } from '../utils/logger.js';
+import { TOOLS } from './tools.js';
 
 // ---------------------------------------------------------------------------
 // Server class
@@ -37,10 +34,7 @@ export class McpBrowserServer {
     this.engine = new BrowserEngine();
     this.sessions = new SessionManager(this.engine);
 
-    this.server = new Server(
-      { name: "abbwak", version: "1.0.0" },
-      { capabilities: { tools: {} } },
-    );
+    this.server = new Server({ name: 'abbwak', version: '1.0.0' }, { capabilities: { tools: {} } });
 
     this.registerHandlers();
   }
@@ -54,37 +48,38 @@ export class McpBrowserServer {
     }));
 
     // Execute a tool
-    this.server.setRequestHandler(CallToolRequestSchema, async (request): Promise<Record<string, unknown>> => {
-      const { name, arguments: args } = request.params;
+    this.server.setRequestHandler(
+      CallToolRequestSchema,
+      async (request): Promise<Record<string, unknown>> => {
+        const { name, arguments: args } = request.params;
 
-      try {
-        switch (name) {
-          case "browser_navigate":
-            return await this.handleNavigate(args) as Record<string, unknown>;
-          case "browser_act":
-            return await this.handleAct(args) as Record<string, unknown>;
-          case "browser_extract":
-            return await this.handleExtract(args) as Record<string, unknown>;
-          case "browser_observe":
-            return await this.handleObserve(args) as Record<string, unknown>;
-          case "browser_screenshot":
-            return await this.handleScreenshot(args) as Record<string, unknown>;
-          default:
-            return errorContent(`Unknown tool: ${name}`) as Record<string, unknown>;
+        try {
+          switch (name) {
+            case 'browser_navigate':
+              return (await this.handleNavigate(args)) as Record<string, unknown>;
+            case 'browser_act':
+              return (await this.handleAct(args)) as Record<string, unknown>;
+            case 'browser_extract':
+              return (await this.handleExtract(args)) as Record<string, unknown>;
+            case 'browser_observe':
+              return (await this.handleObserve(args)) as Record<string, unknown>;
+            case 'browser_screenshot':
+              return (await this.handleScreenshot(args)) as Record<string, unknown>;
+            default:
+              return errorContent(`Unknown tool: ${name}`) as Record<string, unknown>;
+          }
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          logger.error({ tool: name, err }, 'MCP tool error');
+          return errorContent(message) as Record<string, unknown>;
         }
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        logger.error({ tool: name, err }, "MCP tool error");
-        return errorContent(message) as Record<string, unknown>;
-      }
-    });
+      },
+    );
   }
 
   // ── Tool handlers ───────────────────────────────────────────────────────
 
-  private async handleNavigate(
-    args: Record<string, unknown> = {},
-  ): Promise<ToolResponse> {
+  private async handleNavigate(args: Record<string, unknown> = {}): Promise<ToolResponse> {
     const session = await this.ensureSession(args.sessionId as string | undefined);
     const url = args.url as string;
 
@@ -96,13 +91,11 @@ export class McpBrowserServer {
     const text = formatSnapshot(result.snapshot);
 
     return {
-      content: [{ type: "text", text }],
+      content: [{ type: 'text', text }],
     };
   }
 
-  private async handleAct(
-    args: Record<string, unknown> = {},
-  ): Promise<ToolResponse> {
+  private async handleAct(args: Record<string, unknown> = {}): Promise<ToolResponse> {
     const session = await this.ensureSession(args.sessionId as string | undefined);
     const action = args.action as string;
 
@@ -121,55 +114,49 @@ export class McpBrowserServer {
     const result = await executeAction(session, action, {
       target,
       value: args.value as string | undefined,
-      direction: args.direction as "up" | "down" | "left" | "right" | undefined,
+      direction: args.direction as 'up' | 'down' | 'left' | 'right' | undefined,
       selector: args.selector as string | undefined,
-      state: args.state as "visible" | "hidden" | "attached" | "detached" | undefined,
+      state: args.state as 'visible' | 'hidden' | 'attached' | 'detached' | undefined,
       timeout: args.timeout as number | undefined,
       key: args.key as string | undefined,
       filePaths: args.filePaths as string[] | undefined,
-      dialogAction: args.dialogAction as "accept" | "dismiss" | undefined,
+      dialogAction: args.dialogAction as 'accept' | 'dismiss' | undefined,
       promptText: args.promptText as string | undefined,
     });
 
     const text = formatSnapshot(result.snapshot);
 
     return {
-      content: [{ type: "text", text }],
+      content: [{ type: 'text', text }],
     };
   }
 
-  private async handleExtract(
-    args: Record<string, unknown> = {},
-  ): Promise<ToolResponse> {
+  private async handleExtract(args: Record<string, unknown> = {}): Promise<ToolResponse> {
     const session = await this.ensureSession(args.sessionId as string | undefined);
 
     const options: ExtractOptions = {
-      mode: (args.mode as ExtractOptions["mode"]) ?? "text",
+      mode: (args.mode as ExtractOptions['mode']) ?? 'text',
       selector: args.selector as string | undefined,
-      schema: args.schema as ExtractOptions["schema"],
+      schema: args.schema as ExtractOptions['schema'],
       maxLength: args.maxLength as number | undefined,
     };
 
     const result = await extractContent(session.page, options);
 
     const text =
-      typeof result.content === "string"
-        ? result.content
-        : JSON.stringify(result.content, null, 2);
+      typeof result.content === 'string' ? result.content : JSON.stringify(result.content, null, 2);
 
     return {
-      content: [{ type: "text", text }],
+      content: [{ type: 'text', text }],
     };
   }
 
-  private async handleObserve(
-    args: Record<string, unknown> = {},
-  ): Promise<ToolResponse> {
+  private async handleObserve(args: Record<string, unknown> = {}): Promise<ToolResponse> {
     const session = await this.ensureSession(args.sessionId as string | undefined);
 
     const { snapshot, refMap } = await takeSnapshot(session.page, {
       scope: args.scope as string | undefined,
-      verbosity: (args.verbosity as "minimal" | "normal" | "detailed") ?? "normal",
+      verbosity: (args.verbosity as 'minimal' | 'normal' | 'detailed') ?? 'normal',
       maxRefs: args.maxRefs as number | undefined,
     });
 
@@ -183,29 +170,27 @@ export class McpBrowserServer {
     const text = formatSnapshot(snapshot);
 
     return {
-      content: [{ type: "text", text }],
+      content: [{ type: 'text', text }],
     };
   }
 
-  private async handleScreenshot(
-    args: Record<string, unknown> = {},
-  ): Promise<ToolResponse> {
+  private async handleScreenshot(args: Record<string, unknown> = {}): Promise<ToolResponse> {
     const session = await this.ensureSession(args.sessionId as string | undefined);
     const fullPage = (args.fullPage as boolean) ?? false;
 
     const buffer = await session.page.screenshot({
-      type: "png",
+      type: 'png',
       fullPage,
     });
 
-    const base64 = buffer.toString("base64");
+    const base64 = buffer.toString('base64');
 
     return {
       content: [
         {
-          type: "image",
+          type: 'image',
           data: base64,
-          mimeType: "image/png",
+          mimeType: 'image/png',
         },
       ],
     };
@@ -229,14 +214,14 @@ export class McpBrowserServer {
         return this.sessions.getSession(this.defaultSessionId);
       } catch {
         // Session was cleaned up (e.g. expired). Create a fresh one.
-        logger.info("Default session expired, creating a new one");
+        logger.info('Default session expired, creating a new one');
         this.defaultSessionId = null;
       }
     }
 
     const session = await this.sessions.createSession();
     this.defaultSessionId = session.id;
-    logger.info({ sessionId: session.id }, "Default MCP session created");
+    logger.info({ sessionId: session.id }, 'Default MCP session created');
     return session;
   }
 
@@ -250,16 +235,16 @@ export class McpBrowserServer {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
 
-    logger.info("MCP server started (stdio transport)");
+    logger.info('MCP server started (stdio transport)');
   }
 
   async stop(): Promise<void> {
-    logger.info("Stopping MCP server");
+    logger.info('Stopping MCP server');
     this.sessions.stopCleanup();
     await this.sessions.destroyAll();
     await this.engine.close();
     await this.server.close();
-    logger.info("MCP server stopped");
+    logger.info('MCP server stopped');
   }
 }
 
@@ -270,15 +255,14 @@ export class McpBrowserServer {
 interface ToolResponse {
   [key: string]: unknown;
   content: Array<
-    | { type: "text"; text: string }
-    | { type: "image"; data: string; mimeType: string }
+    { type: 'text'; text: string } | { type: 'image'; data: string; mimeType: string }
   >;
   isError?: boolean;
 }
 
 function errorContent(message: string): ToolResponse {
   return {
-    content: [{ type: "text", text: `Error: ${message}` }],
+    content: [{ type: 'text', text: `Error: ${message}` }],
     isError: true,
   };
 }
@@ -296,8 +280,8 @@ export async function startMcpServer(): Promise<McpBrowserServer> {
     process.exit(0);
   };
 
-  process.on("SIGINT", shutdown);
-  process.on("SIGTERM", shutdown);
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
 
   await server.start();
   return server;
@@ -309,12 +293,12 @@ export async function startMcpServer(): Promise<McpBrowserServer> {
 
 const isMain =
   import.meta.url === `file://${process.argv[1]}` ||
-  process.argv[1]?.endsWith("/mcp/server.ts") ||
-  process.argv[1]?.endsWith("/mcp/server.js");
+  process.argv[1]?.endsWith('/mcp/server.ts') ||
+  process.argv[1]?.endsWith('/mcp/server.js');
 
 if (isMain) {
   startMcpServer().catch((err) => {
-    logger.error({ err }, "Failed to start MCP server");
+    logger.error({ err }, 'Failed to start MCP server');
     process.exit(1);
   });
 }

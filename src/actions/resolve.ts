@@ -1,9 +1,9 @@
-import type { ElementHandle } from "playwright";
-import type { Session } from "../browser/session.js";
-import type { ActionTarget } from "./types.js";
-import { ActionError } from "../utils/errors.js";
-import { sanitizeSelector } from "../utils/sanitize.js";
-import { logger } from "../utils/logger.js";
+import type { ElementHandle } from 'playwright';
+import type { Session } from '../browser/session.js';
+import { ActionError } from '../utils/errors.js';
+import { logger } from '../utils/logger.js';
+import { sanitizeSelector } from '../utils/sanitize.js';
+import type { ActionTarget } from './types.js';
 
 /**
  * Resolve an element from a ref ID or CSS selector.
@@ -20,9 +20,10 @@ export async function resolveElement(
     element = session.getElementByRef(target.ref);
     if (!element) {
       const availableRefs = [...session.refs.keys()];
-      const hint = availableRefs.length > 0
-        ? ` Available refs: ${availableRefs.slice(0, 10).join(", ")}${availableRefs.length > 10 ? ` ... (${availableRefs.length} total)` : ""}`
-        : " No refs available — call observe first.";
+      const hint =
+        availableRefs.length > 0
+          ? ` Available refs: ${availableRefs.slice(0, 10).join(', ')}${availableRefs.length > 10 ? ` ... (${availableRefs.length} total)` : ''}`
+          : ' No refs available — call observe first.';
       throw new ActionError(
         actionName,
         `Element ref "${target.ref}" not found in current snapshot.${hint}`,
@@ -30,9 +31,7 @@ export async function resolveElement(
     }
 
     // Validate the element is still attached to the DOM
-    const isAttached = await element.evaluate(
-      (el) => el.isConnected,
-    ).catch(() => false);
+    const isAttached = await element.evaluate((el) => el.isConnected).catch(() => false);
 
     if (!isAttached) {
       throw new ActionError(
@@ -47,7 +46,7 @@ export async function resolveElement(
       throw new ActionError(actionName, `No element matches selector "${safe}"`);
     }
   } else {
-    throw new ActionError(actionName, "Either ref or selector must be provided");
+    throw new ActionError(actionName, 'Either ref or selector must be provided');
   }
 
   return element;
@@ -62,7 +61,7 @@ export async function withRetry<T>(
   options: { retries?: number; actionName?: string } = {},
 ): Promise<T> {
   const maxRetries = options.retries ?? 1;
-  const actionName = options.actionName ?? "action";
+  const actionName = options.actionName ?? 'action';
   let lastError: Error | undefined;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -73,10 +72,10 @@ export async function withRetry<T>(
 
       // Only retry on transient errors
       const isTransient =
-        lastError.message.includes("Timeout") ||
-        lastError.message.includes("detached") ||
-        lastError.message.includes("Target closed") ||
-        lastError.message.includes("Execution context was destroyed");
+        lastError.message.includes('Timeout') ||
+        lastError.message.includes('detached') ||
+        lastError.message.includes('Target closed') ||
+        lastError.message.includes('Execution context was destroyed');
 
       if (!isTransient || attempt >= maxRetries) {
         throw err;
@@ -84,7 +83,7 @@ export async function withRetry<T>(
 
       logger.debug(
         { actionName, attempt: attempt + 1, error: lastError.message },
-        "Retrying action after transient failure",
+        'Retrying action after transient failure',
       );
 
       // Brief pause before retry

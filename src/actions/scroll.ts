@@ -1,22 +1,23 @@
-import type { Session } from "../browser/session.js";
-import type { ActionTarget, ActionResult } from "./types.js";
-import { ActionError } from "../utils/errors.js";
-import { sanitizeSelector } from "../utils/sanitize.js";
-import { takeSnapshot } from "../processing/snapshot.js";
+import type { ElementHandle } from 'playwright';
+import type { Session } from '../browser/session.js';
+import { takeSnapshot } from '../processing/snapshot.js';
+import { ActionError } from '../utils/errors.js';
+import { sanitizeSelector } from '../utils/sanitize.js';
+import type { ActionResult, ActionTarget } from './types.js';
 
 const SCROLL_AMOUNT = 500;
 
-type ScrollDirection = "up" | "down" | "left" | "right";
+type ScrollDirection = 'up' | 'down' | 'left' | 'right';
 
 function scrollDelta(direction: ScrollDirection): { x: number; y: number } {
   switch (direction) {
-    case "up":
+    case 'up':
       return { x: 0, y: -SCROLL_AMOUNT };
-    case "down":
+    case 'down':
       return { x: 0, y: SCROLL_AMOUNT };
-    case "left":
+    case 'left':
       return { x: -SCROLL_AMOUNT, y: 0 };
-    case "right":
+    case 'right':
       return { x: SCROLL_AMOUNT, y: 0 };
   }
 }
@@ -29,13 +30,13 @@ export async function executeScroll(
   try {
     if (target && (target.ref || target.selector)) {
       // Scroll a specific element into view
-      let element;
+      let element: ElementHandle | null | undefined;
 
       if (target.ref) {
         element = session.getElementByRef(target.ref);
         if (!element) {
           throw new ActionError(
-            "scroll",
+            'scroll',
             `Element ref "${target.ref}" not found in current snapshot`,
           );
         }
@@ -43,10 +44,7 @@ export async function executeScroll(
         const safe = sanitizeSelector(target.selector);
         element = await session.page.$(safe);
         if (!element) {
-          throw new ActionError(
-            "scroll",
-            `No element matches selector "${safe}"`,
-          );
+          throw new ActionError('scroll', `No element matches selector "${safe}"`);
         }
       }
 
@@ -69,7 +67,7 @@ export async function executeScroll(
   } catch (err) {
     if (err instanceof ActionError) throw err;
     const message = err instanceof Error ? err.message : String(err);
-    throw new ActionError("scroll", message);
+    throw new ActionError('scroll', message);
   }
 
   // Take a fresh snapshot and update session refs

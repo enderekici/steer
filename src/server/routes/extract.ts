@@ -1,5 +1,5 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { extractContent, type ExtractOptions } from "../../processing/content.js";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { type ExtractOptions, extractContent } from '../../processing/content.js';
 
 interface SessionParams {
   id: string;
@@ -10,28 +10,28 @@ export async function extractRoutes(fastify: FastifyInstance): Promise<void> {
 
   // POST /sessions/:id/extract
   fastify.post<{ Params: SessionParams; Body: ExtractOptions }>(
-    "/:id/extract",
+    '/:id/extract',
     {
       schema: {
         params: {
-          type: "object",
+          type: 'object',
           properties: {
-            id: { type: "string" },
+            id: { type: 'string' },
           },
-          required: ["id"],
+          required: ['id'],
         },
         body: {
-          type: "object",
+          type: 'object',
           properties: {
             mode: {
-              type: "string",
-              enum: ["text", "markdown", "structured"],
+              type: 'string',
+              enum: ['text', 'markdown', 'structured'],
             },
-            selector: { type: "string" },
-            schema: { type: "object" },
-            maxLength: { type: "integer", minimum: 1 },
+            selector: { type: 'string' },
+            schema: { type: 'object' },
+            maxLength: { type: 'integer', minimum: 1 },
           },
-          required: ["mode"],
+          required: ['mode'],
           additionalProperties: false,
         },
       },

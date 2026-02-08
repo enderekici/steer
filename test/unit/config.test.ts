@@ -1,7 +1,7 @@
-process.env.PLAYWRIGHT_BROWSERS_PATH = process.env.HOME + '/.cache/ms-playwright';
+process.env.PLAYWRIGHT_BROWSERS_PATH = `${process.env.HOME}/.cache/ms-playwright`;
 process.env.ABBWAK_LOG_LEVEL = 'silent';
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { config } from '../../src/config.js';
 
 /**

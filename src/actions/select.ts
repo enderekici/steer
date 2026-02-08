@@ -1,22 +1,17 @@
-import type { ElementHandle } from "playwright";
-import type { Session } from "../browser/session.js";
-import type { ActionTarget, ActionResult } from "./types.js";
-import { ActionError } from "../utils/errors.js";
-import { sanitizeSelector } from "../utils/sanitize.js";
-import { takeSnapshot } from "../processing/snapshot.js";
-import { resolveElement } from "./resolve.js";
-import { logger } from "../utils/logger.js";
+import type { ElementHandle } from 'playwright';
+import type { Session } from '../browser/session.js';
+import { takeSnapshot } from '../processing/snapshot.js';
+import { ActionError } from '../utils/errors.js';
+import { logger } from '../utils/logger.js';
+import { sanitizeSelector } from '../utils/sanitize.js';
+import { resolveElement } from './resolve.js';
+import type { ActionResult, ActionTarget } from './types.js';
 
 async function isNativeSelect(element: ElementHandle): Promise<boolean> {
-  return element.evaluate(
-    (el) => (el as unknown as Element).tagName.toLowerCase() === "select",
-  );
+  return element.evaluate((el) => (el as unknown as Element).tagName.toLowerCase() === 'select');
 }
 
-async function getEffectiveSelector(
-  target: ActionTarget,
-  element: ElementHandle,
-): Promise<string> {
+async function getEffectiveSelector(target: ActionTarget, element: ElementHandle): Promise<string> {
   if (target.selector) {
     return sanitizeSelector(target.selector);
   }
@@ -24,8 +19,8 @@ async function getEffectiveSelector(
   const generated: string = await element.evaluate((node) => {
     const el = node as unknown as Element;
     if (el.id) return `#${el.id}`;
-    if (el.getAttribute("name")) {
-      return `${el.tagName.toLowerCase()}[name="${el.getAttribute("name")}"]`;
+    if (el.getAttribute('name')) {
+      return `${el.tagName.toLowerCase()}[name="${el.getAttribute('name')}"]`;
     }
     const path: string[] = [];
     let current: Element | null = el;
@@ -38,9 +33,7 @@ async function getEffectiveSelector(
       }
       const parent: Element | null = current.parentElement;
       if (parent) {
-        const siblings = Array.from(parent.children).filter(
-          (c) => c.tagName === current!.tagName,
-        );
+        const siblings = Array.from(parent.children).filter((c) => c.tagName === current?.tagName);
         if (siblings.length > 1) {
           const idx = siblings.indexOf(current) + 1;
           seg += `:nth-of-type(${idx})`;
@@ -49,7 +42,7 @@ async function getEffectiveSelector(
       path.unshift(seg);
       current = parent;
     }
-    return path.join(" > ");
+    return path.join(' > ');
   });
 
   return generated;
@@ -60,7 +53,7 @@ export async function executeSelect(
   target: ActionTarget,
   value: string,
 ): Promise<ActionResult> {
-  const element = await resolveElement(session, target, "select");
+  const element = await resolveElement(session, target, 'select');
 
   try {
     const isNative = await isNativeSelect(element);
@@ -69,10 +62,7 @@ export async function executeSelect(
       const selector = await getEffectiveSelector(target, element);
       await session.page.selectOption(selector, value);
     } else {
-      logger.info(
-        { sessionId: session.id, value },
-        "Handling custom dropdown select",
-      );
+      logger.info({ sessionId: session.id, value }, 'Handling custom dropdown select');
 
       await element.scrollIntoViewIfNeeded().catch(() => {});
       await element.click({ timeout: 5000 });
@@ -101,20 +91,15 @@ export async function executeSelect(
       }
 
       if (!clicked) {
-        throw new ActionError(
-          "select",
-          `Could not find option "${value}" in custom dropdown`,
-        );
+        throw new ActionError('select', `Could not find option "${value}" in custom dropdown`);
       }
     }
 
-    await session.page
-      .waitForLoadState("domcontentloaded", { timeout: 3000 })
-      .catch(() => {});
+    await session.page.waitForLoadState('domcontentloaded', { timeout: 3000 }).catch(() => {});
   } catch (err) {
     if (err instanceof ActionError) throw err;
     const message = err instanceof Error ? err.message : String(err);
-    throw new ActionError("select", message);
+    throw new ActionError('select', message);
   }
 
   const { snapshot, refMap } = await takeSnapshot(session.page);

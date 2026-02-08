@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 interface CreateSessionBody {
   profile?: string;
@@ -11,24 +11,24 @@ export async function sessionRoutes(fastify: FastifyInstance): Promise<void> {
 
   // POST /sessions - create a new browser session
   fastify.post<{ Body: CreateSessionBody }>(
-    "/",
+    '/',
     {
       schema: {
         body: {
-          type: "object",
+          type: 'object',
           properties: {
-            profile: { type: "string" },
+            profile: { type: 'string' },
             viewport: {
-              type: "object",
+              type: 'object',
               properties: {
-                width: { type: "integer", minimum: 320, maximum: 3840 },
-                height: { type: "integer", minimum: 240, maximum: 2160 },
+                width: { type: 'integer', minimum: 320, maximum: 3840 },
+                height: { type: 'integer', minimum: 240, maximum: 2160 },
               },
-              required: ["width", "height"],
+              required: ['width', 'height'],
             },
             blockResources: {
-              type: "array",
-              items: { type: "string" },
+              type: 'array',
+              items: { type: 'string' },
             },
           },
           additionalProperties: false,
@@ -53,22 +53,22 @@ export async function sessionRoutes(fastify: FastifyInstance): Promise<void> {
   );
 
   // GET /sessions - list active sessions
-  fastify.get("/", async (_request: FastifyRequest, _reply: FastifyReply) => {
+  fastify.get('/', async (_request: FastifyRequest, _reply: FastifyReply) => {
     const sessions = sm.listSessions();
     return { sessions };
   });
 
   // DELETE /sessions/:id - destroy a session
   fastify.delete<{ Params: { id: string } }>(
-    "/:id",
+    '/:id',
     {
       schema: {
         params: {
-          type: "object",
+          type: 'object',
           properties: {
-            id: { type: "string" },
+            id: { type: 'string' },
           },
-          required: ["id"],
+          required: ['id'],
         },
       },
     },

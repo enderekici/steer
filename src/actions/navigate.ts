@@ -1,10 +1,10 @@
-import type { Session } from "../browser/session.js";
-import type { ActionResult } from "./types.js";
-import { ActionError, DomainNotAllowedError } from "../utils/errors.js";
-import { sanitizeUrl } from "../utils/sanitize.js";
-import { config } from "../config.js";
-import { takeSnapshot } from "../processing/snapshot.js";
-import { logger } from "../utils/logger.js";
+import type { Session } from '../browser/session.js';
+import { config } from '../config.js';
+import { takeSnapshot } from '../processing/snapshot.js';
+import { ActionError, DomainNotAllowedError } from '../utils/errors.js';
+import { logger } from '../utils/logger.js';
+import { sanitizeUrl } from '../utils/sanitize.js';
+import type { ActionResult } from './types.js';
 
 function isDomainAllowed(url: string): boolean {
   const allowedDomains = config.allowedDomains;
@@ -29,7 +29,7 @@ function isDomainAllowed(url: string): boolean {
 export async function executeNavigate(
   session: Session,
   url: string,
-  waitUntil?: "load" | "domcontentloaded" | "networkidle",
+  waitUntil?: 'load' | 'domcontentloaded' | 'networkidle',
 ): Promise<ActionResult> {
   // Sanitize and validate the URL
   const sanitized = sanitizeUrl(url);
@@ -42,17 +42,17 @@ export async function executeNavigate(
 
   try {
     logger.info(
-      { sessionId: session.id, url: sanitized, waitUntil: waitUntil ?? "domcontentloaded" },
-      "Navigating",
+      { sessionId: session.id, url: sanitized, waitUntil: waitUntil ?? 'domcontentloaded' },
+      'Navigating',
     );
 
     await session.page.goto(sanitized, {
-      waitUntil: waitUntil ?? "domcontentloaded",
+      waitUntil: waitUntil ?? 'domcontentloaded',
       timeout: 30000,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    throw new ActionError("navigate", `Navigation to ${sanitized} failed: ${message}`);
+    throw new ActionError('navigate', `Navigation to ${sanitized} failed: ${message}`);
   }
 
   // Take a fresh snapshot and update session refs

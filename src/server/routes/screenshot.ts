@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 interface SessionParams {
   id: string;
@@ -14,21 +14,21 @@ export async function screenshotRoutes(fastify: FastifyInstance): Promise<void> 
 
   // GET /sessions/:id/screenshot
   fastify.get<{ Params: SessionParams; Querystring: ScreenshotQuery }>(
-    "/:id/screenshot",
+    '/:id/screenshot',
     {
       schema: {
         params: {
-          type: "object",
+          type: 'object',
           properties: {
-            id: { type: "string" },
+            id: { type: 'string' },
           },
-          required: ["id"],
+          required: ['id'],
         },
         querystring: {
-          type: "object",
+          type: 'object',
           properties: {
-            fullPage: { type: "boolean", default: false },
-            quality: { type: "integer", minimum: 1, maximum: 100, default: 50 },
+            fullPage: { type: 'boolean', default: false },
+            quality: { type: 'integer', minimum: 1, maximum: 100, default: 50 },
           },
           additionalProperties: false,
         },
@@ -45,14 +45,14 @@ export async function screenshotRoutes(fastify: FastifyInstance): Promise<void> 
       const quality = request.query.quality ?? 50;
 
       const buffer = await session.page.screenshot({
-        type: "jpeg",
+        type: 'jpeg',
         fullPage,
         quality,
       });
 
       return reply
-        .header("Content-Type", "image/jpeg")
-        .header("Content-Length", buffer.length)
+        .header('Content-Type', 'image/jpeg')
+        .header('Content-Length', buffer.length)
         .send(buffer);
     },
   );

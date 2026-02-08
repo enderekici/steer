@@ -1,9 +1,9 @@
-process.env.PLAYWRIGHT_BROWSERS_PATH = process.env.HOME + '/.cache/ms-playwright';
+process.env.PLAYWRIGHT_BROWSERS_PATH = `${process.env.HOME}/.cache/ms-playwright`;
 process.env.ABBWAK_LOG_LEVEL = 'silent';
 
-import { describe, it, expect } from 'vitest';
-import { sanitizeUrl, sanitizeSelector, truncateText } from '../../src/utils/sanitize.js';
+import { describe, expect, it } from 'vitest';
 import { ValidationError } from '../../src/utils/errors.js';
+import { sanitizeSelector, sanitizeUrl, truncateText } from '../../src/utils/sanitize.js';
 
 // ── sanitizeUrl ─────────────────────────────────────────────────────────────
 

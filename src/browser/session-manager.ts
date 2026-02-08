@@ -1,8 +1,8 @@
-import { config } from "../config.js";
-import { logger } from "../utils/logger.js";
-import { SessionNotFoundError, SessionLimitError } from "../utils/errors.js";
-import { BrowserEngine } from "./engine.js";
-import { Session, type SessionCreateOptions } from "./session.js";
+import { config } from '../config.js';
+import { SessionLimitError, SessionNotFoundError } from '../utils/errors.js';
+import { logger } from '../utils/logger.js';
+import type { BrowserEngine } from './engine.js';
+import { Session, type SessionCreateOptions } from './session.js';
 
 interface SessionInfo {
   id: string;
@@ -41,7 +41,7 @@ export class SessionManager {
 
     logger.info(
       { sessionId: session.id, activeSessions: this.sessions.size },
-      "Session registered",
+      'Session registered',
     );
 
     return session;
@@ -65,10 +65,7 @@ export class SessionManager {
     await session.close();
     this.sessions.delete(id);
 
-    logger.info(
-      { sessionId: id, activeSessions: this.sessions.size },
-      "Session destroyed",
-    );
+    logger.info({ sessionId: id, activeSessions: this.sessions.size }, 'Session destroyed');
   }
 
   listSessions(): SessionInfo[] {
@@ -85,10 +82,7 @@ export class SessionManager {
   }
 
   async destroyAll(): Promise<void> {
-    logger.info(
-      { count: this.sessions.size },
-      "Destroying all sessions",
-    );
+    logger.info({ count: this.sessions.size }, 'Destroying all sessions');
 
     const closeTasks = [...this.sessions.values()].map((s) => s.close());
     await Promise.allSettled(closeTasks);
@@ -99,9 +93,9 @@ export class SessionManager {
     const timeoutMs = config.sessionTimeoutMs;
     for (const [id, session] of this.sessions) {
       if (session.isExpired(timeoutMs)) {
-        logger.info({ sessionId: id }, "Session expired, cleaning up");
+        logger.info({ sessionId: id }, 'Session expired, cleaning up');
         session.close().catch((err) => {
-          logger.error({ sessionId: id, err }, "Error closing expired session");
+          logger.error({ sessionId: id, err }, 'Error closing expired session');
         });
         this.sessions.delete(id);
       }

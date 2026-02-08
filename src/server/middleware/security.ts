@@ -1,7 +1,7 @@
-import type { FastifyInstance } from "fastify";
-import fp from "fastify-plugin";
-import cors from "@fastify/cors";
-import rateLimit from "@fastify/rate-limit";
+import cors from '@fastify/cors';
+import rateLimit from '@fastify/rate-limit';
+import type { FastifyInstance } from 'fastify';
+import fp from 'fastify-plugin';
 
 export interface SecurityOptions {
   corsOrigin?: boolean | string | string[];
@@ -15,16 +15,16 @@ async function securityPlugin(
 ): Promise<void> {
   await fastify.register(cors, {
     origin: options.corsOrigin ?? true,
-    methods: ["GET", "POST", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   await fastify.register(rateLimit, {
     max: options.rateLimitMax ?? 100,
-    timeWindow: options.rateLimitWindow ?? "1 minute",
+    timeWindow: options.rateLimitWindow ?? '1 minute',
   });
 }
 
 export default fp(securityPlugin, {
-  name: "security",
+  name: 'security',
 });
