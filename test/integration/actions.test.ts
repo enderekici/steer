@@ -1,4 +1,4 @@
-process.env.ABBWAK_LOG_LEVEL = 'silent';
+process.env.STEER_LOG_LEVEL = 'silent';
 
 // Some tests (click, type) require a full Chromium environment with sufficient
 // memory and a working compositor.  In constrained CI containers (cgroups ≤512 MB,
@@ -11,10 +11,10 @@ import {
   type Browser,
   type BrowserContext,
   type BrowserType,
-  type ElementHandle,
-  type Page,
   chromium,
+  type ElementHandle,
   firefox,
+  type Page,
   webkit,
 } from 'playwright';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
@@ -32,7 +32,7 @@ const complexSpaUrl = `file://${path.join(FIXTURES_DIR, 'complex-spa.html')}`;
 const tableDataUrl = `file://${path.join(FIXTURES_DIR, 'table-data.html')}`;
 
 const browserTypes: Record<string, BrowserType> = { chromium, firefox, webkit };
-const BROWSER_NAME = process.env.ABBWAK_BROWSER || 'firefox';
+const BROWSER_NAME = process.env.STEER_BROWSER || 'firefox';
 const browserType = browserTypes[BROWSER_NAME] || firefox;
 const LAUNCH_ARGS = [
   '--no-sandbox',
@@ -44,7 +44,7 @@ const LAUNCH_ARGS = [
 let browser: Browser;
 
 beforeAll(async () => {
-  const executablePath = process.env.ABBWAK_EXECUTABLE_PATH || undefined;
+  const executablePath = process.env.STEER_EXECUTABLE_PATH || undefined;
   browser = await browserType.launch({
     headless: true,
     executablePath,

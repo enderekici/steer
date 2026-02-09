@@ -28,7 +28,7 @@
 ### Infrastructure
 - [x] REST API (Fastify 5)
 - [x] MCP server (stdio transport)
-- [x] CLI (`abbwak`, `abbwak --mcp`, `abbwak --help`)
+- [x] CLI (`steer`, `steer --mcp`, `steer --help`)
 - [x] Docker multi-stage build (Firefox-only, ~400MB lighter)
 - [x] docker-compose with memory limits
 - [x] Firefox as default browser (lower memory)
@@ -208,10 +208,10 @@ Run multiple browser instances for high-throughput.
 ### Agent SDK
 **Priority: MEDIUM**
 
-TypeScript SDK for building agents on top of abbwak.
+TypeScript SDK for building agents on top of steer.
 
 ```typescript
-import { AbbwakClient } from "abbwak/client";
+import { AbbwakClient } from "steer/client";
 
 const browser = new AbbwakClient("http://localhost:3000");
 const session = await browser.createSession();
@@ -234,14 +234,14 @@ Auto-generated OpenAPI 3.1 spec from Fastify schemas.
 
 ## Not Planned (Out of Scope)
 
-These are explicitly out of scope to keep abbwak focused:
+These are explicitly out of scope to keep steer focused:
 
 | Feature | Why not |
 |---------|---------|
-| **Visual AI (GPT-4V integration)** | abbwak provides the browser, not the AI. Agents bring their own model. |
-| **Recording/replay** | Use Playwright's codegen directly. abbwak is API-first. |
+| **Visual AI (GPT-4V integration)** | steer provides the browser, not the AI. Agents bring their own model. |
+| **Recording/replay** | Use Playwright's codegen directly. steer is API-first. |
 | **Browser extension** | Focus is headless server, not browser extension. |
-| **SaaS/hosted version** | abbwak is self-hosted by design. No cloud service planned. |
+| **SaaS/hosted version** | steer is self-hosted by design. No cloud service planned. |
 | **Non-Playwright backends** | Puppeteer, Selenium, etc. Playwright covers all browsers. |
 | **Built-in proxy** | Use container networking or external proxy. |
 | **PDF rendering** | Use browser print-to-PDF via evaluate, or external tools. |

@@ -11,12 +11,12 @@ describe('CLI', () => {
       encoding: 'utf-8',
       cwd: process.cwd(),
     });
-    expect(output).toContain('abbwak');
+    expect(output).toContain('steer');
     expect(output).toContain('--mcp');
-    expect(output).toContain('ABBWAK_PORT');
-    expect(output).toContain('ABBWAK_SESSION_TIMEOUT_MS');
-    expect(output).toContain('ABBWAK_REQUEST_TIMEOUT_MS');
-    expect(output).toContain('ABBWAK_EXECUTABLE_PATH');
+    expect(output).toContain('STEER_PORT');
+    expect(output).toContain('STEER_SESSION_TIMEOUT_MS');
+    expect(output).toContain('STEER_REQUEST_TIMEOUT_MS');
+    expect(output).toContain('STEER_EXECUTABLE_PATH');
   });
 
   it('should show help with -h flag', () => {
@@ -24,7 +24,7 @@ describe('CLI', () => {
       encoding: 'utf-8',
       cwd: process.cwd(),
     });
-    expect(output).toContain('abbwak');
+    expect(output).toContain('steer');
     expect(output).toContain('mcpServers');
   });
 });

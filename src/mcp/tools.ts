@@ -1,5 +1,5 @@
 /**
- * MCP tool definitions for abbwak browser primitives.
+ * MCP tool definitions for steer browser primitives.
  *
  * Each tool follows the @modelcontextprotocol/sdk Tool interface with
  * name, description, and a JSON-Schema inputSchema.

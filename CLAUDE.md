@@ -1,8 +1,8 @@
 # CLAUDE.md
 
-Project instructions for AI assistants working on abbwak.
+Project instructions for AI assistants working on steer.
 
-## What is abbwak?
+## What is steer?
 
 A self-hosted headless browser for AI agents. Two interfaces: REST API (Fastify) and MCP server (stdio). Agents navigate pages, observe interactive elements via ref IDs, perform actions, and extract content — all without API keys.
 
@@ -25,8 +25,8 @@ npm run lint:fix     # Auto-fix lint issues
 ```
 src/
 ├── index.ts              # REST API entry point
-├── cli.ts                # CLI (abbwak [--mcp] [--help])
-├── config.ts             # Env-based config (all ABBWAK_* vars)
+├── cli.ts                # CLI (steer [--mcp] [--help])
+├── config.ts             # Env-based config (all STEER_* vars)
 ├── browser/
 │   ├── engine.ts         # BrowserEngine singleton (launch/close)
 │   ├── session.ts        # Session class (context, page, refs)
@@ -101,7 +101,7 @@ SKIP_HEAVY_BROWSER_TESTS=1 npm test   # Skip click/type (OOM in low-memory CI)
 - No internet access (network-dependent tests will fail)
 - Chromium/Firefox crash under heavy load (click/type tests timeout)
 - Use `SKIP_HEAVY_BROWSER_TESTS=1` to skip flaky browser action tests
-- Use `ABBWAK_EXECUTABLE_PATH` env var if browser binary is in a non-standard location
+- Use `STEER_EXECUTABLE_PATH` env var if browser binary is in a non-standard location
 
 ## Code Style
 
@@ -163,20 +163,20 @@ SKIP_HEAVY_BROWSER_TESTS=1 npm test   # Skip click/type (OOM in low-memory CI)
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `ABBWAK_PORT` | `3000` | Server port |
-| `ABBWAK_HOST` | `0.0.0.0` | Server host |
-| `ABBWAK_MAX_SESSIONS` | `10` | Max concurrent sessions |
-| `ABBWAK_SESSION_TIMEOUT_MS` | `300000` | Session idle timeout (5 min) |
-| `ABBWAK_REQUEST_TIMEOUT_MS` | `30000` | Request timeout (30s) |
-| `ABBWAK_HEADLESS` | `true` | Headless browser |
-| `ABBWAK_BROWSER` | `firefox` | Browser: chromium, firefox, webkit |
-| `ABBWAK_BLOCK_RESOURCES` | `image,font,media` | Blocked resource types |
-| `ABBWAK_ALLOWED_DOMAINS` | (empty) | Domain allowlist (empty = all) |
-| `ABBWAK_VIEWPORT_WIDTH` | `1280` | Viewport width |
-| `ABBWAK_VIEWPORT_HEIGHT` | `720` | Viewport height |
-| `ABBWAK_EXECUTABLE_PATH` | (auto) | Custom browser path |
-| `ABBWAK_MCP_PORT` | `3001` | MCP HTTP server port |
-| `ABBWAK_LOG_LEVEL` | `info` | Log level |
+| `STEER_PORT` | `3000` | Server port |
+| `STEER_HOST` | `0.0.0.0` | Server host |
+| `STEER_MAX_SESSIONS` | `10` | Max concurrent sessions |
+| `STEER_SESSION_TIMEOUT_MS` | `300000` | Session idle timeout (5 min) |
+| `STEER_REQUEST_TIMEOUT_MS` | `30000` | Request timeout (30s) |
+| `STEER_HEADLESS` | `true` | Headless browser |
+| `STEER_BROWSER` | `firefox` | Browser: chromium, firefox, webkit |
+| `STEER_BLOCK_RESOURCES` | `image,font,media` | Blocked resource types |
+| `STEER_ALLOWED_DOMAINS` | (empty) | Domain allowlist (empty = all) |
+| `STEER_VIEWPORT_WIDTH` | `1280` | Viewport width |
+| `STEER_VIEWPORT_HEIGHT` | `720` | Viewport height |
+| `STEER_EXECUTABLE_PATH` | (auto) | Custom browser path |
+| `STEER_MCP_PORT` | `3001` | MCP HTTP server port |
+| `STEER_LOG_LEVEL` | `info` | Log level |
 
 ## HTTP Routes Summary
 

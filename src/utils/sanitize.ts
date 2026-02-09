@@ -1,7 +1,7 @@
 import { ValidationError } from './errors.js';
 
 const BLOCKED_PROTOCOLS = ['javascript:', 'data:', 'file:', 'vbscript:'];
-const SELECTOR_PATTERN = /^[a-zA-Z0-9\s\-_.*#:\[\]()='"~^$|,>+@\\/.]+$/;
+const SELECTOR_PATTERN = /^[a-zA-Z0-9\s\-_.*#:[\]()='"~^$|,>+@\\/.]+$/;
 
 export function sanitizeUrl(url: string): string {
   const trimmed = url.trim();

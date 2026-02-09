@@ -5,7 +5,7 @@ import { logger } from '../utils/logger.js';
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const MAX_TEXT_LENGTH = 100;
-const DATA_ATTR = 'data-abbwak-ref';
+const DATA_ATTR = 'data-steer-ref';
 
 /**
  * Interactive element selectors -- anything a user can click, type into, or
@@ -97,7 +97,7 @@ export interface SnapshotOptions {
  * The approach:
  *  1. A single `page.evaluate()` call walks the DOM, filters hidden
  *     elements, computes accessible names, and stamps each surviving
- *     element with `data-abbwak-ref="rN"`.
+ *     element with `data-steer-ref="rN"`.
  *  2. Back in Node we iterate the results and call `page.$()` to obtain
  *     a live ElementHandle for each stamped element.  This guarantees a
  *     reliable 1:1 mapping (unlike querying `$$` separately which can

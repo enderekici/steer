@@ -21,7 +21,7 @@ async function main(): Promise<void> {
 
   await app.listen({ port: config.port, host: config.host });
 
-  logger.info({ url: `http://${config.host}:${config.port}` }, 'abbwak server started');
+  logger.info({ url: `http://${config.host}:${config.port}` }, 'steer server started');
 
   // 4. Graceful shutdown handler
   async function shutdown(signal: string): Promise<void> {
@@ -55,6 +55,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  logger.fatal({ err }, 'Failed to start abbwak server');
+  logger.fatal({ err }, 'Failed to start steer server');
   process.exit(1);
 });

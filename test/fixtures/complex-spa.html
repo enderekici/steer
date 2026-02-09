@@ -76,9 +76,9 @@
 
   <script>
     // Tab switching
-    document.querySelectorAll('.tab').forEach(function(tab) {
-      tab.addEventListener('click', function() {
-        document.querySelectorAll('.tab').forEach(function(t) {
+    document.querySelectorAll('.tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach((t) => {
           t.classList.remove('active');
           t.setAttribute('aria-selected', 'false');
         });
@@ -93,13 +93,13 @@
     });
 
     // Deploy modal
-    document.getElementById('deploy-btn').addEventListener('click', function() {
+    document.getElementById('deploy-btn').addEventListener('click', () => {
       document.getElementById('modal').showModal();
     });
-    document.getElementById('cancel-deploy').addEventListener('click', function() {
+    document.getElementById('cancel-deploy').addEventListener('click', () => {
       document.getElementById('modal').close();
     });
-    document.getElementById('confirm-deploy').addEventListener('click', function() {
+    document.getElementById('confirm-deploy').addEventListener('click', () => {
       document.getElementById('modal').close();
       alert('Deployed!');
     });

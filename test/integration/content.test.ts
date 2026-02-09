@@ -1,14 +1,14 @@
 process.env.PLAYWRIGHT_BROWSERS_PATH = `${process.env.HOME}/.cache/ms-playwright`;
-process.env.ABBWAK_LOG_LEVEL = 'silent';
+process.env.STEER_LOG_LEVEL = 'silent';
 
 import path from 'node:path';
 import {
   type Browser,
   type BrowserContext,
   type BrowserType,
-  type Page,
   chromium,
   firefox,
+  type Page,
   webkit,
 } from 'playwright';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -20,7 +20,7 @@ const tableDataUrl = `file://${path.join(FIXTURES_DIR, 'table-data.html')}`;
 const loginFormUrl = `file://${path.join(FIXTURES_DIR, 'login-form.html')}`;
 
 const browserTypes: Record<string, BrowserType> = { chromium, firefox, webkit };
-const BROWSER_NAME = process.env.ABBWAK_BROWSER || 'firefox';
+const BROWSER_NAME = process.env.STEER_BROWSER || 'firefox';
 const browserType = browserTypes[BROWSER_NAME] || firefox;
 
 let browser: Browser;
@@ -28,7 +28,7 @@ let ctx: BrowserContext;
 let page: Page;
 
 beforeAll(async () => {
-  const executablePath = process.env.ABBWAK_EXECUTABLE_PATH || undefined;
+  const executablePath = process.env.STEER_EXECUTABLE_PATH || undefined;
   browser = await browserType.launch({
     headless: true,
     executablePath,

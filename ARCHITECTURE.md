@@ -1,6 +1,6 @@
 # Architecture
 
-Technical guide for developers contributing to or deploying abbwak.
+Technical guide for developers contributing to or deploying steer.
 
 ---
 
@@ -240,13 +240,13 @@ The core differentiator. Runs inside `page.evaluate()`:
       - textContent (trimmed, 80 char limit)
    d. Extract role (explicit role attr or implicit from tag)
    e. Extract value, checked, disabled, expanded, options
-   f. Stamp element: data-abbwak-ref="rN"
+   f. Stamp element: data-steer-ref="rN"
    g. Add to results array
 
 5. Return to Node.js context
 
 6. For each ref, resolve ElementHandle:
-   page.$(`[data-abbwak-ref="rN"]`)
+   page.$(`[data-steer-ref="rN"]`)
 
 7. Return { snapshot: PageSnapshot, refMap: Map<string, ElementHandle> }
 ```
@@ -476,7 +476,7 @@ Full accessibility trees are 10-50x larger, burning agent context windows. The r
 - ~30-40% less memory than Chromium at idle
 - Better stability in memory-constrained containers
 - Good enough web compatibility for agent tasks
-- Chromium/WebKit still available via `ABBWAK_BROWSER` config
+- Chromium/WebKit still available via `STEER_BROWSER` config
 
 ### Why two interfaces (REST + MCP)?
 
@@ -499,7 +499,7 @@ Playwright's `page.accessibility.snapshot()` returns the full tree including:
 - Hidden/aria-hidden elements
 - Duplicate text from parent/child relationships
 
-abbwak's custom DOM walker is more selective and agent-friendly.
+steer's custom DOM walker is more selective and agent-friendly.
 
 ---
 

@@ -1,5 +1,5 @@
 process.env.PLAYWRIGHT_BROWSERS_PATH = `${process.env.HOME}/.cache/ms-playwright`;
-process.env.ABBWAK_LOG_LEVEL = 'silent';
+process.env.STEER_LOG_LEVEL = 'silent';
 
 import { describe, expect, it } from 'vitest';
 import {

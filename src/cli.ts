@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * CLI entry point for abbwak.
+ * CLI entry point for steer.
  *
  * Usage:
- *   npx abbwak              # Start the REST API server
- *   npx abbwak --mcp        # Start the MCP server (stdio transport)
- *   npx abbwak --mcp-http   # Start the MCP server (HTTP transport)
- *   npx abbwak --help       # Show help
+ *   npx steer              # Start the REST API server
+ *   npx steer --mcp        # Start the MCP server (stdio transport)
+ *   npx steer --mcp-http   # Start the MCP server (HTTP transport)
+ *   npx steer --help       # Show help
  */
 
 export {};
@@ -17,34 +17,34 @@ const args = process.argv.slice(2);
 if (args.includes('--help') || args.includes('-h')) {
   console.log(
     `
-abbwak — API-Based Browser Without API Key
+steer — API-Based Browser Without API Key
 
 Usage:
-  abbwak              Start the REST API server (default: http://0.0.0.0:3000)
-  abbwak --mcp        Start the MCP server (stdio transport, for Claude Desktop)
-  abbwak --mcp-http   Start the MCP server (HTTP transport, for Docker / remote)
-  abbwak --help       Show this help message
+  steer              Start the REST API server (default: http://0.0.0.0:3000)
+  steer --mcp        Start the MCP server (stdio transport, for Claude Desktop)
+  steer --mcp-http   Start the MCP server (HTTP transport, for Docker / remote)
+  steer --help       Show this help message
 
 Environment variables:
-  ABBWAK_PORT               Server port (default: 3000)
-  ABBWAK_HOST               Server host (default: 0.0.0.0)
-  ABBWAK_MCP_PORT           MCP HTTP server port (default: 3001)
-  ABBWAK_MAX_SESSIONS       Max concurrent sessions (default: 10)
-  ABBWAK_SESSION_TIMEOUT_MS Session idle timeout in ms (default: 300000)
-  ABBWAK_REQUEST_TIMEOUT_MS Request timeout in ms (default: 30000)
-  ABBWAK_HEADLESS           Run browser headless (default: true)
-  ABBWAK_BROWSER            Browser engine: chromium|firefox|webkit (default: firefox)
-  ABBWAK_BLOCK_RESOURCES    Comma-separated resource types to block (default: image,font,media)
-  ABBWAK_ALLOWED_DOMAINS    Comma-separated domain allowlist (default: all)
-  ABBWAK_EXECUTABLE_PATH    Custom browser executable path
-  ABBWAK_LOG_LEVEL          Log level: silent|debug|info|warn|error (default: info)
+  STEER_PORT               Server port (default: 3000)
+  STEER_HOST               Server host (default: 0.0.0.0)
+  STEER_MCP_PORT           MCP HTTP server port (default: 3001)
+  STEER_MAX_SESSIONS       Max concurrent sessions (default: 10)
+  STEER_SESSION_TIMEOUT_MS Session idle timeout in ms (default: 300000)
+  STEER_REQUEST_TIMEOUT_MS Request timeout in ms (default: 30000)
+  STEER_HEADLESS           Run browser headless (default: true)
+  STEER_BROWSER            Browser engine: chromium|firefox|webkit (default: firefox)
+  STEER_BLOCK_RESOURCES    Comma-separated resource types to block (default: image,font,media)
+  STEER_ALLOWED_DOMAINS    Comma-separated domain allowlist (default: all)
+  STEER_EXECUTABLE_PATH    Custom browser executable path
+  STEER_LOG_LEVEL          Log level: silent|debug|info|warn|error (default: info)
 
 MCP setup (Claude Desktop — stdio):
   {
     "mcpServers": {
-      "abbwak": {
+      "steer": {
         "command": "npx",
-        "args": ["abbwak", "--mcp"]
+        "args": ["steer", "--mcp"]
       }
     }
   }
@@ -52,7 +52,7 @@ MCP setup (Claude Desktop — stdio):
 MCP setup (Claude Desktop — Docker HTTP):
   {
     "mcpServers": {
-      "abbwak": {
+      "steer": {
         "url": "http://localhost:3001/mcp"
       }
     }
@@ -65,8 +65,8 @@ MCP setup (Claude Desktop — Docker HTTP):
 if (args.includes('--mcp-http')) {
   // MCP HTTP mode: Streamable HTTP transport (for Docker / remote)
   const { startMcpHttpServer } = await import('./mcp/server.js');
-  const port = Number.parseInt(process.env.ABBWAK_MCP_PORT || '3001', 10);
-  const host = process.env.ABBWAK_HOST || '0.0.0.0';
+  const port = Number.parseInt(process.env.STEER_MCP_PORT || '3001', 10);
+  const host = process.env.STEER_HOST || '0.0.0.0';
   await startMcpHttpServer(port, host);
 } else if (args.includes('--mcp')) {
   // MCP stdio mode: for local Claude Desktop

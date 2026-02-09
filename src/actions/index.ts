@@ -12,18 +12,17 @@ import type { ActionResult, ActionTarget } from './types.js';
 import { executeUpload } from './upload.js';
 import { executeWait } from './wait.js';
 
-export type { ActionTarget, ActionResult } from './types.js';
 export { executeClick } from './click.js';
-export { executeType } from './type.js';
-export { executeSelect } from './select.js';
-export { executeScroll } from './scroll.js';
-export { executeNavigate } from './navigate.js';
-export { executeWait } from './wait.js';
-export { executeKeyboard } from './keyboard.js';
+export { executeDialogConfig, installDialogHandler } from './dialog.js';
 export { executeHover } from './hover.js';
+export { executeKeyboard } from './keyboard.js';
+export { executeNavigate } from './navigate.js';
+export { executeScroll } from './scroll.js';
+export { executeSelect } from './select.js';
+export { executeType } from './type.js';
+export type { ActionResult, ActionTarget } from './types.js';
 export { executeUpload } from './upload.js';
-export { executeDialogConfig } from './dialog.js';
-export { installDialogHandler } from './dialog.js';
+export { executeWait } from './wait.js';
 
 type ScrollDirection = 'up' | 'down' | 'left' | 'right';
 

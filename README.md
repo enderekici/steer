@@ -1,12 +1,12 @@
-# abbwak
+# steer
 
 **API-Based Browser Without API Key** — A free, open-source headless browser designed for AI agents.
 
 No API keys. No paid services. Just a powerful, self-hosted browser that agents can control via REST API or MCP.
 
-## Why abbwak?
+## Why steer?
 
-Existing browser tools for agents (Browserbase, Steel Cloud, Bright Data) charge per session or require API keys. Playwright MCP dumps 26+ tools and full accessibility trees, burning agent context windows. abbwak gives you:
+Existing browser tools for agents (Browserbase, Steel Cloud, Bright Data) charge per session or require API keys. Playwright MCP dumps 26+ tools and full accessibility trees, burning agent context windows. steer gives you:
 
 - **5 clean endpoints** — `navigate`, `act`, `extract`, `observe`, `screenshot`
 - **10 actions** — click, type, select, scroll, wait, keyboard, hover, upload, dialog
@@ -42,12 +42,12 @@ docker compose up
 ### Option 3: Global install
 
 ```bash
-npm install -g abbwak
+npm install -g steer
 npx playwright install firefox
 
-abbwak              # REST API on http://0.0.0.0:3000
-abbwak --mcp        # MCP server (stdio transport)
-abbwak --help       # Show all options
+steer              # REST API on http://0.0.0.0:3000
+steer --mcp        # MCP server (stdio transport)
+steer --help       # Show all options
 ```
 
 ---
@@ -61,9 +61,9 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 ```json
 {
   "mcpServers": {
-    "abbwak": {
+    "steer": {
       "command": "npx",
-      "args": ["abbwak", "--mcp"]
+      "args": ["steer", "--mcp"]
     }
   }
 }
@@ -74,14 +74,14 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 Start the MCP server as a Docker container, then connect via HTTP:
 
 ```bash
-docker compose up -d abbwak-mcp
+docker compose up -d steer-mcp
 # MCP server listening at http://localhost:3001/mcp
 ```
 
 ```json
 {
   "mcpServers": {
-    "abbwak": {
+    "steer": {
       "url": "http://localhost:3001/mcp"
     }
   }
@@ -93,8 +93,8 @@ This uses the MCP Streamable HTTP transport — the container runs as a long-liv
 Without Docker Compose:
 
 ```bash
-docker build -t abbwak .
-docker run -d -p 3001:3001 --name abbwak-mcp abbwak node dist/cli.js --mcp-http
+docker build -t steer .
+docker run -d -p 3001:3001 --name steer-mcp steer node dist/cli.js --mcp-http
 ```
 
 ### Claude Code (local npm)
@@ -104,9 +104,9 @@ Add to `.claude/settings.json`:
 ```json
 {
   "mcpServers": {
-    "abbwak": {
+    "steer": {
       "command": "npx",
-      "args": ["abbwak", "--mcp"]
+      "args": ["steer", "--mcp"]
     }
   }
 }
@@ -117,7 +117,7 @@ Add to `.claude/settings.json`:
 ```json
 {
   "mcpServers": {
-    "abbwak": {
+    "steer": {
       "url": "http://localhost:3001/mcp"
     }
   }
@@ -538,12 +538,12 @@ GET /health
 
 ## How Snapshot+Refs Works
 
-Instead of dumping the full accessibility tree (thousands of nodes), abbwak:
+Instead of dumping the full accessibility tree (thousands of nodes), steer:
 
 1. Walks the DOM and finds **interactive elements** (links, buttons, inputs, selects, contenteditable) plus **structural elements** (headings, landmarks, alerts)
 2. Filters out hidden elements (`display:none`, `visibility:hidden`, `opacity:0`, `aria-hidden`)
 3. Computes accessible names via ARIA labels, `<label>`, `alt`, `title`, `placeholder`, `textContent`
-4. Stamps each element with a stable `data-abbwak-ref` attribute (`r1`, `r2`, ...)
+4. Stamps each element with a stable `data-steer-ref` attribute (`r1`, `r2`, ...)
 5. Returns a compact list of `{ ref, role, name, value?, checked?, disabled?, options? }`
 6. Agents use ref IDs to target elements in subsequent `act` calls
 
@@ -563,20 +563,20 @@ All configuration via environment variables:
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `ABBWAK_PORT` | int | `3000` | HTTP server port |
-| `ABBWAK_HOST` | string | `0.0.0.0` | HTTP server bind address |
-| `ABBWAK_MAX_SESSIONS` | int | `10` | Maximum concurrent browser sessions |
-| `ABBWAK_SESSION_TIMEOUT_MS` | int | `300000` | Session idle timeout in ms (5 min) |
-| `ABBWAK_REQUEST_TIMEOUT_MS` | int | `30000` | HTTP request timeout in ms (30s) |
-| `ABBWAK_HEADLESS` | bool | `true` | Run browser in headless mode |
-| `ABBWAK_BROWSER` | string | `firefox` | Browser engine: `chromium`, `firefox`, `webkit` |
-| `ABBWAK_ALLOWED_DOMAINS` | string | (empty) | Comma-separated domain allowlist (empty = all) |
-| `ABBWAK_BLOCK_RESOURCES` | string | `image,font,media` | Comma-separated resource types to block |
-| `ABBWAK_VIEWPORT_WIDTH` | int | `1280` | Default viewport width |
-| `ABBWAK_VIEWPORT_HEIGHT` | int | `720` | Default viewport height |
-| `ABBWAK_EXECUTABLE_PATH` | string | (auto) | Custom browser executable path |
-| `ABBWAK_MCP_PORT` | int | `3001` | MCP HTTP server port |
-| `ABBWAK_LOG_LEVEL` | string | `info` | Log level: `silent`, `debug`, `info`, `warn`, `error` |
+| `STEER_PORT` | int | `3000` | HTTP server port |
+| `STEER_HOST` | string | `0.0.0.0` | HTTP server bind address |
+| `STEER_MAX_SESSIONS` | int | `10` | Maximum concurrent browser sessions |
+| `STEER_SESSION_TIMEOUT_MS` | int | `300000` | Session idle timeout in ms (5 min) |
+| `STEER_REQUEST_TIMEOUT_MS` | int | `30000` | HTTP request timeout in ms (30s) |
+| `STEER_HEADLESS` | bool | `true` | Run browser in headless mode |
+| `STEER_BROWSER` | string | `firefox` | Browser engine: `chromium`, `firefox`, `webkit` |
+| `STEER_ALLOWED_DOMAINS` | string | (empty) | Comma-separated domain allowlist (empty = all) |
+| `STEER_BLOCK_RESOURCES` | string | `image,font,media` | Comma-separated resource types to block |
+| `STEER_VIEWPORT_WIDTH` | int | `1280` | Default viewport width |
+| `STEER_VIEWPORT_HEIGHT` | int | `720` | Default viewport height |
+| `STEER_EXECUTABLE_PATH` | string | (auto) | Custom browser executable path |
+| `STEER_MCP_PORT` | int | `3001` | MCP HTTP server port |
+| `STEER_LOG_LEVEL` | string | `info` | Log level: `silent`, `debug`, `info`, `warn`, `error` |
 
 ---
 
@@ -585,25 +585,25 @@ All configuration via environment variables:
 ### Build and run
 
 ```bash
-docker build -t abbwak .
+docker build -t steer .
 
 # REST API server
-docker run -p 3000:3000 abbwak
+docker run -p 3000:3000 steer
 
 # MCP server (HTTP transport)
-docker run -d -p 3001:3001 abbwak node dist/cli.js --mcp-http
+docker run -d -p 3001:3001 steer node dist/cli.js --mcp-http
 ```
 
 ### Docker Compose
 
 ```bash
 # REST API server (default)
-docker compose up abbwak         # Start REST API on port 3000
-docker compose up -d abbwak      # Start detached
+docker compose up steer         # Start REST API on port 3000
+docker compose up -d steer      # Start detached
 
 # MCP server (HTTP transport)
-docker compose up abbwak-mcp     # Start MCP on port 3001
-docker compose up -d abbwak-mcp  # Start detached
+docker compose up steer-mcp     # Start MCP on port 3001
+docker compose up -d steer-mcp  # Start detached
 
 # Both services
 docker compose up -d             # Start everything
@@ -612,32 +612,32 @@ docker compose down              # Stop all
 ```
 
 The `docker-compose.yml` includes two services:
-- **`abbwak`** — REST API server on port 3000
-- **`abbwak-mcp`** — MCP server on port 3001 (Streamable HTTP transport)
+- **`steer`** — REST API server on port 3000
+- **`steer-mcp`** — MCP server on port 3001 (Streamable HTTP transport)
 
 ### Connecting Claude Desktop to Docker MCP
 
 1. Start the MCP container:
    ```bash
-   docker compose up -d abbwak-mcp
+   docker compose up -d steer-mcp
    ```
 
 2. Add to Claude Desktop config (`claude_desktop_config.json`):
    ```json
    {
      "mcpServers": {
-       "abbwak": {
+       "steer": {
          "url": "http://localhost:3001/mcp"
        }
      }
    }
    ```
 
-3. Restart Claude Desktop — abbwak tools will appear automatically.
+3. Restart Claude Desktop — steer tools will appear automatically.
 
 ### MCP Transport Modes
 
-abbwak supports two MCP transport modes:
+steer supports two MCP transport modes:
 
 | Mode | Flag | Use case |
 |------|------|----------|
@@ -684,7 +684,7 @@ All errors follow a consistent JSON format:
 ## Security
 
 - **URL sanitization:** Blocks `javascript:`, `data:`, `file:`, `vbscript:` protocols; only `http`/`https` allowed
-- **Domain allowlist:** `ABBWAK_ALLOWED_DOMAINS` restricts which domains can be navigated to
+- **Domain allowlist:** `STEER_ALLOWED_DOMAINS` restricts which domains can be navigated to
 - **Selector sanitization:** CSS selectors validated against injection patterns
 - **Keyboard validation:** Only whitelisted keys and modifier combos allowed
 - **Rate limiting:** 100 requests/minute per IP

@@ -35,11 +35,11 @@
   <p>Don't have an account? <a href="/register">Create one</a></p>
   <div id="message" class="hidden"></div>
   <script>
-    document.getElementById('login-form').addEventListener('submit', function(e) {
+    document.getElementById('login-form').addEventListener('submit', (e) => {
       e.preventDefault();
       var msg = document.getElementById('message');
       msg.classList.remove('hidden');
-      msg.textContent = 'Welcome, ' + document.getElementById('username').value + '!';
+      msg.textContent = `Welcome, ${document.getElementById('username').value}!`;
     });
   </script>
 </body>

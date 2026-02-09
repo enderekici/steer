@@ -81,7 +81,7 @@ jobs:
       - name: Run integration tests
         run: npm test -- test/integration/
         env:
-          ABBWAK_BROWSER: firefox
+          STEER_BROWSER: firefox
 
   docker:
     name: Docker Build
@@ -91,11 +91,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t abbwak:ci .
+        run: docker build -t steer:ci .
 
       - name: Verify container starts
         run: |
-          docker run -d --name abbwak-test -p 3000:3000 abbwak:ci
+          docker run -d --name steer-test -p 3000:3000 steer:ci
           sleep 10
           curl -sf http://localhost:3000/health | grep -q '"status":"ok"'
-          docker stop abbwak-test
+          docker stop steer-test

@@ -10,7 +10,7 @@
  *  - Session TTL expiry
  */
 
-process.env.ABBWAK_LOG_LEVEL = 'silent';
+process.env.STEER_LOG_LEVEL = 'silent';
 
 import fs from 'node:fs';
 import http from 'node:http';

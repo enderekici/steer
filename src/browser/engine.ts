@@ -38,7 +38,7 @@ export class BrowserEngine {
 
     logger.info({ browser: browserName, headless }, 'Launching browser');
 
-    const executablePath = process.env.ABBWAK_EXECUTABLE_PATH || undefined;
+    const executablePath = process.env.STEER_EXECUTABLE_PATH || undefined;
 
     this.browser = await browserType.launch({
       headless,

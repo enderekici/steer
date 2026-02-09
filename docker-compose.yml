@@ -1,19 +1,19 @@
 services:
   # REST API server (default) — http://localhost:3000
-  abbwak:
+  steer:
     build: .
     ports:
       - "3000:3000"
     environment:
-      - ABBWAK_PORT=3000
-      - ABBWAK_HEADLESS=true
-      - ABBWAK_BROWSER=firefox
-      - ABBWAK_MAX_SESSIONS=10
-      - ABBWAK_SESSION_TIMEOUT_MS=300000
-      - ABBWAK_BLOCK_RESOURCES=image,font,media
-      # - ABBWAK_ALLOWED_DOMAINS=github.com,google.com
+      - STEER_PORT=3000
+      - STEER_HEADLESS=true
+      - STEER_BROWSER=firefox
+      - STEER_MAX_SESSIONS=10
+      - STEER_SESSION_TIMEOUT_MS=300000
+      - STEER_BLOCK_RESOURCES=image,font,media
+      # - STEER_ALLOWED_DOMAINS=github.com,google.com
     volumes:
-      - abbwak-profiles:/app/profiles
+      - steer-profiles:/app/profiles
     restart: unless-stopped
     deploy:
       resources:
@@ -23,20 +23,20 @@ services:
           memory: 512m
 
   # MCP server (HTTP transport) — for Claude Desktop / Claude Code via Docker
-  # Connect with: { "mcpServers": { "abbwak": { "url": "http://localhost:3001/mcp" } } }
-  abbwak-mcp:
+  # Connect with: { "mcpServers": { "steer": { "url": "http://localhost:3001/mcp" } } }
+  steer-mcp:
     build: .
     ports:
       - "3001:3001"
     command: ["node", "dist/cli.js", "--mcp-http"]
     environment:
-      - ABBWAK_MCP_PORT=3001
-      - ABBWAK_HOST=0.0.0.0
-      - ABBWAK_HEADLESS=true
-      - ABBWAK_BROWSER=firefox
-      - ABBWAK_MAX_SESSIONS=5
-      - ABBWAK_SESSION_TIMEOUT_MS=300000
-      - ABBWAK_BLOCK_RESOURCES=image,font,media
+      - STEER_MCP_PORT=3001
+      - STEER_HOST=0.0.0.0
+      - STEER_HEADLESS=true
+      - STEER_BROWSER=firefox
+      - STEER_MAX_SESSIONS=5
+      - STEER_SESSION_TIMEOUT_MS=300000
+      - STEER_BLOCK_RESOURCES=image,font,media
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:3001/health').then(r=>{if(!r.ok)throw 1})"]
@@ -51,4 +51,4 @@ services:
           memory: 512m
 
 volumes:
-  abbwak-profiles:
+  steer-profiles:

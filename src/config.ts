@@ -33,17 +33,17 @@ function envBrowser(key: string, fallback: BrowserType): BrowserType {
 }
 
 export const config = {
-  port: envInt('ABBWAK_PORT', 3000),
-  host: env('ABBWAK_HOST', '0.0.0.0'),
-  maxSessions: envInt('ABBWAK_MAX_SESSIONS', 10),
-  sessionTimeoutMs: envInt('ABBWAK_SESSION_TIMEOUT_MS', 300_000),
-  requestTimeoutMs: envInt('ABBWAK_REQUEST_TIMEOUT_MS', 30_000),
-  allowedDomains: envList('ABBWAK_ALLOWED_DOMAINS', []),
-  headless: envBool('ABBWAK_HEADLESS', true),
-  blockResources: envList('ABBWAK_BLOCK_RESOURCES', ['image', 'font', 'media']),
-  browser: envBrowser('ABBWAK_BROWSER', 'firefox'),
-  viewportWidth: envInt('ABBWAK_VIEWPORT_WIDTH', 1280),
-  viewportHeight: envInt('ABBWAK_VIEWPORT_HEIGHT', 720),
+  port: envInt('STEER_PORT', 3000),
+  host: env('STEER_HOST', '0.0.0.0'),
+  maxSessions: envInt('STEER_MAX_SESSIONS', 10),
+  sessionTimeoutMs: envInt('STEER_SESSION_TIMEOUT_MS', 300_000),
+  requestTimeoutMs: envInt('STEER_REQUEST_TIMEOUT_MS', 30_000),
+  allowedDomains: envList('STEER_ALLOWED_DOMAINS', []),
+  headless: envBool('STEER_HEADLESS', true),
+  blockResources: envList('STEER_BLOCK_RESOURCES', ['image', 'font', 'media']),
+  browser: envBrowser('STEER_BROWSER', 'firefox'),
+  viewportWidth: envInt('STEER_VIEWPORT_WIDTH', 1280),
+  viewportHeight: envInt('STEER_VIEWPORT_HEIGHT', 720),
 } as const;
 
 export type Config = typeof config;

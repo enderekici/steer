@@ -1,4 +1,4 @@
-# abbwak — Implementation Plan
+# steer — Implementation Plan
 
 > API-Based Browser Without API Key
 > A free, self-hosted headless browser for AI agents.
@@ -32,7 +32,7 @@ AI agents need browsers. Current options are:
 - **Playwright MCP** — free but dumps 26+ tools and full accessibility trees, destroying agent context windows
 - **Browser Use** — good but Python-only, tightly coupled to specific LLM providers
 
-### What abbwak is
+### What steer is
 A **self-hosted, zero-cost, language-agnostic HTTP API** that wraps a headless browser with an agent-optimized interface. Any agent (Python, TypeScript, Rust, Go, curl) can control a real browser through a clean REST API + optional MCP server.
 
 ### Design Principles
@@ -58,7 +58,7 @@ A **self-hosted, zero-cost, language-agnostic HTTP API** that wraps a headless b
                        │  HTTP REST  or  MCP Protocol
                        ▼
 ┌─────────────────────────────────────────────────────────┐
-│                   abbwak Server                          │
+│                   steer Server                          │
 │  ┌─────────────┐  ┌──────────────┐  ┌───────────────┐  │
 │  │  REST API    │  │  MCP Server  │  │  WebSocket     │  │
 │  │  (Fastify)   │  │  (optional)  │  │  (live events) │  │
@@ -123,7 +123,7 @@ A **self-hosted, zero-cost, language-agnostic HTTP API** that wraps a headless b
 ## 4. Project Structure
 
 ```
-abbwak/
+steer/
 ├── src/
 │   ├── index.ts                  # Entry point — starts server
 │   ├── config.ts                 # Configuration (env vars, defaults)
@@ -468,7 +468,7 @@ Returns JPEG image. Quality parameter (1-100) controls compression. Agents shoul
 
 ## 7. Agent Interface — The 5 Primitives
 
-The API surface is intentionally small. Research shows agents perform better with fewer, more powerful tools than with many specific ones. abbwak exposes exactly **5 primitives**:
+The API surface is intentionally small. Research shows agents perform better with fewer, more powerful tools than with many specific ones. steer exposes exactly **5 primitives**:
 
 | # | Primitive | What it does | When to use |
 |---|---|---|---|
@@ -493,12 +493,12 @@ The `act` primitive handles all interactions through a single endpoint with an `
 
 ## 8. Context Efficiency — The Key Differentiator
 
-Context window management is the #1 problem with browser agents. abbwak addresses this at every layer:
+Context window management is the #1 problem with browser agents. steer addresses this at every layer:
 
 ### 8.1 Snapshot+Refs (93% reduction)
 
 Full accessibility tree of github.com: ~3,000 nodes, ~15,000 tokens.
-abbwak snapshot of github.com: ~30-80 refs, ~500-1,200 tokens.
+steer snapshot of github.com: ~30-80 refs, ~500-1,200 tokens.
 
 ### 8.2 Resource Blocking
 
@@ -558,14 +558,14 @@ This means an agent can log in once, and subsequent sessions reuse the authentic
 ### 10.1 Domain Allowlist (opt-in)
 
 ```
-ABBWAK_ALLOWED_DOMAINS=github.com,google.com,stackoverflow.com
+STEER_ALLOWED_DOMAINS=github.com,google.com,stackoverflow.com
 ```
 
 When set, the browser will only navigate to allowed domains. All other navigations are blocked. This prevents prompt injection attacks where a malicious page tries to redirect the agent to an attacker-controlled site.
 
 ### 10.2 No Arbitrary Code Execution
 
-abbwak does NOT expose `page.evaluate()` or any arbitrary JavaScript execution endpoint. All interactions go through the structured action primitives. This prevents agents from being tricked into running malicious scripts.
+steer does NOT expose `page.evaluate()` or any arbitrary JavaScript execution endpoint. All interactions go through the structured action primitives. This prevents agents from being tricked into running malicious scripts.
 
 ### 10.3 Request Sanitization
 
@@ -584,13 +584,13 @@ All user inputs (URLs, selectors, typed text) are sanitized:
 
 ### 10.5 Network Isolation
 
-The browser runs in the server's network context. For production use, run abbwak in a container with restricted network access (e.g., Docker with `--network` constraints).
+The browser runs in the server's network context. For production use, run steer in a container with restricted network access (e.g., Docker with `--network` constraints).
 
 ---
 
 ## 11. MCP Server Integration
 
-abbwak includes an optional MCP (Model Context Protocol) server that exposes the same 5 primitives as MCP tools. This allows direct integration with Claude Desktop, Cursor, VS Code Copilot, and other MCP-compatible hosts.
+steer includes an optional MCP (Model Context Protocol) server that exposes the same 5 primitives as MCP tools. This allows direct integration with Claude Desktop, Cursor, VS Code Copilot, and other MCP-compatible hosts.
 
 ### MCP Tool Definitions
 
@@ -759,7 +759,7 @@ test/fixtures/
 - [ ] SSE transport for remote use
 - [ ] MCP integration tests
 
-**Milestone:** `abbwak` appears as a tool in Claude Desktop / Cursor.
+**Milestone:** `steer` appears as a tool in Claude Desktop / Cursor.
 
 ### Phase 5 — Advanced Features
 **Goal:** Competitive with paid alternatives.
@@ -770,7 +770,7 @@ test/fixtures/
 - [ ] Basic anti-detection (realistic user agent, viewport, webdriver flag removal)
 - [ ] WebSocket live events (page load, navigation, console errors)
 - [ ] Docker image for one-command deployment
-- [ ] CLI tool: `npx abbwak` to start server instantly
+- [ ] CLI tool: `npx steer` to start server instantly
 - [ ] Benchmark suite: token efficiency, latency, success rate on web tasks
 
 **Milestone:** Feature-complete, deployable, benchmarked.
@@ -781,7 +781,7 @@ test/fixtures/
 
 ### 14.1 Token Efficiency Benchmark
 
-Compare abbwak snapshot vs. Playwright MCP accessibility tree on 20 real-world pages:
+Compare steer snapshot vs. Playwright MCP accessibility tree on 20 real-world pages:
 - Simple: Google search, Wikipedia article, Hacker News
 - Medium: GitHub repo page, Amazon product page, Reddit thread
 - Complex: Gmail inbox, Jira board, Figma dashboard
@@ -816,7 +816,7 @@ Target: **> 90% success rate** on supported sites.
 
 ## Summary
 
-abbwak is a focused, opinionated tool:
+steer is a focused, opinionated tool:
 
 - **5 primitives** instead of 26+ tools
 - **Snapshot+Refs** instead of full accessibility trees (93% fewer tokens)

@@ -1,5 +1,5 @@
 /**
- * MCP server for abbwak — exposes browser primitives as MCP tools
+ * MCP server for steer — exposes browser primitives as MCP tools
  * for use with Claude Desktop, Cursor, and other MCP-compatible clients.
  *
  * Run standalone:  npx tsx src/mcp/server.ts
@@ -11,14 +11,13 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-
-import { executeAction, executeNavigate } from '../actions/index.js';
 import type { ActionTarget } from '../actions/index.js';
+import { executeAction, executeNavigate } from '../actions/index.js';
 import { BrowserEngine } from '../browser/engine.js';
-import { SessionManager } from '../browser/session-manager.js';
 import type { Session } from '../browser/session.js';
-import { extractContent } from '../processing/content.js';
+import { SessionManager } from '../browser/session-manager.js';
 import type { ExtractOptions } from '../processing/content.js';
+import { extractContent } from '../processing/content.js';
 import { formatSnapshot, takeSnapshot } from '../processing/snapshot.js';
 import { logger } from '../utils/logger.js';
 import { TOOLS } from './tools.js';
@@ -37,7 +36,7 @@ export class McpBrowserServer {
     this.engine = new BrowserEngine();
     this.sessions = new SessionManager(this.engine);
 
-    this.server = new Server({ name: 'abbwak', version: '1.0.0' }, { capabilities: { tools: {} } });
+    this.server = new Server({ name: 'steer', version: '1.0.0' }, { capabilities: { tools: {} } });
 
     this.registerHandlers();
   }
@@ -294,7 +293,7 @@ export class McpBrowserServer {
 
           // Each HTTP session gets its own MCP Server + handlers
           const sessionServer = new Server(
-            { name: 'abbwak', version: '1.0.0' },
+            { name: 'steer', version: '1.0.0' },
             { capabilities: { tools: {} } },
           );
           this.registerHandlersOn(sessionServer);

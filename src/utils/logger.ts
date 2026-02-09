@@ -1,6 +1,6 @@
 import pino from 'pino';
 
-const level = process.env.ABBWAK_LOG_LEVEL ?? 'info';
+const level = process.env.STEER_LOG_LEVEL ?? 'info';
 const isDev = process.env.NODE_ENV !== 'production';
 
 export const logger = pino({

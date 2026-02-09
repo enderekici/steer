@@ -1,5 +1,5 @@
 process.env.PLAYWRIGHT_BROWSERS_PATH = `${process.env.HOME}/.cache/ms-playwright`;
-process.env.ABBWAK_LOG_LEVEL = 'silent';
+process.env.STEER_LOG_LEVEL = 'silent';
 
 import { describe, expect, it } from 'vitest';
 import { config } from '../../src/config.js';
@@ -66,58 +66,58 @@ describe('config default values (when env vars are not overridden)', () => {
   // the corresponding env vars set, these may need adjustment.
 
   it('should default port to 3000', () => {
-    if (!process.env.ABBWAK_PORT) {
+    if (!process.env.STEER_PORT) {
       expect(config.port).toBe(3000);
     }
   });
 
   it('should default host to 0.0.0.0', () => {
-    if (!process.env.ABBWAK_HOST) {
+    if (!process.env.STEER_HOST) {
       expect(config.host).toBe('0.0.0.0');
     }
   });
 
   it('should default maxSessions to 10', () => {
-    if (!process.env.ABBWAK_MAX_SESSIONS) {
+    if (!process.env.STEER_MAX_SESSIONS) {
       expect(config.maxSessions).toBe(10);
     }
   });
 
   it('should default sessionTimeoutMs to 300000', () => {
-    if (!process.env.ABBWAK_SESSION_TIMEOUT_MS) {
+    if (!process.env.STEER_SESSION_TIMEOUT_MS) {
       expect(config.sessionTimeoutMs).toBe(300_000);
     }
   });
 
   it('should default allowedDomains to empty array', () => {
-    if (!process.env.ABBWAK_ALLOWED_DOMAINS) {
+    if (!process.env.STEER_ALLOWED_DOMAINS) {
       expect(config.allowedDomains).toEqual([]);
     }
   });
 
   it('should default headless to true', () => {
-    if (!process.env.ABBWAK_HEADLESS) {
+    if (!process.env.STEER_HEADLESS) {
       expect(config.headless).toBe(true);
     }
   });
 
   it('should default blockResources to image, font, media', () => {
-    if (!process.env.ABBWAK_BLOCK_RESOURCES) {
+    if (!process.env.STEER_BLOCK_RESOURCES) {
       expect(config.blockResources).toEqual(['image', 'font', 'media']);
     }
   });
 
   it('should default browser to firefox', () => {
-    if (!process.env.ABBWAK_BROWSER) {
+    if (!process.env.STEER_BROWSER) {
       expect(config.browser).toBe('firefox');
     }
   });
 
   it('should default viewport to 1280x720', () => {
-    if (!process.env.ABBWAK_VIEWPORT_WIDTH) {
+    if (!process.env.STEER_VIEWPORT_WIDTH) {
       expect(config.viewportWidth).toBe(1280);
     }
-    if (!process.env.ABBWAK_VIEWPORT_HEIGHT) {
+    if (!process.env.STEER_VIEWPORT_HEIGHT) {
       expect(config.viewportHeight).toBe(720);
     }
   });

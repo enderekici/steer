@@ -276,7 +276,7 @@ async function extractStructured(
           switch (type) {
             case 'number':
             case 'integer': {
-              const n = Number.parseFloat(value.replace(/[^0-9.\-]/g, ''));
+              const n = Number.parseFloat(value.replace(/[^0-9.-]/g, ''));
               return Number.isNaN(n) ? null : n;
             }
             case 'boolean':
@@ -342,7 +342,7 @@ async function extractStructured(
           switch (type) {
             case 'number':
             case 'integer': {
-              const n = Number.parseFloat(value.replace(/[^0-9.\-]/g, ''));
+              const n = Number.parseFloat(value.replace(/[^0-9.-]/g, ''));
               return Number.isNaN(n) ? null : n;
             }
             case 'boolean':
