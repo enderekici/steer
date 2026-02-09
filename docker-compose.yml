@@ -22,18 +22,27 @@ services:
         reservations:
           memory: 512m
 
-  # MCP server (stdio transport) — for Claude Desktop / Claude Code
-  # Usage: docker compose run --rm abbwak-mcp
+  # MCP server (HTTP transport) — for Claude Desktop / Claude Code via Docker
+  # Connect with: { "mcpServers": { "abbwak": { "url": "http://localhost:3001/mcp" } } }
   abbwak-mcp:
     build: .
-    stdin_open: true
-    command: ["node", "dist/cli.js", "--mcp"]
+    ports:
+      - "3001:3001"
+    command: ["node", "dist/cli.js", "--mcp-http"]
     environment:
+      - ABBWAK_MCP_PORT=3001
+      - ABBWAK_HOST=0.0.0.0
       - ABBWAK_HEADLESS=true
       - ABBWAK_BROWSER=firefox
       - ABBWAK_MAX_SESSIONS=5
       - ABBWAK_SESSION_TIMEOUT_MS=300000
       - ABBWAK_BLOCK_RESOURCES=image,font,media
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3001/health').then(r=>{if(!r.ok)throw 1})"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     deploy:
       resources:
         limits:

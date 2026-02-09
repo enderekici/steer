@@ -71,41 +71,30 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 
 ### Claude Desktop (Docker)
 
-First build the image, then point Claude Desktop to `docker run`:
+Start the MCP server as a Docker container, then connect via HTTP:
+
+```bash
+docker compose up -d abbwak-mcp
+# MCP server listening at http://localhost:3001/mcp
+```
+
+```json
+{
+  "mcpServers": {
+    "abbwak": {
+      "url": "http://localhost:3001/mcp"
+    }
+  }
+}
+```
+
+This uses the MCP Streamable HTTP transport — the container runs as a long-lived service and Claude Desktop connects over HTTP. No stdio pipe needed.
+
+Without Docker Compose:
 
 ```bash
 docker build -t abbwak .
-```
-
-```json
-{
-  "mcpServers": {
-    "abbwak": {
-      "command": "docker",
-      "args": ["run", "-i", "--rm", "abbwak", "node", "dist/cli.js", "--mcp"]
-    }
-  }
-}
-```
-
-> **Note:** The `-i` flag is required — MCP uses stdio transport (stdin/stdout) to communicate. The `--rm` flag auto-removes the container when the session ends.
-
-To pass environment variables to the Docker MCP server:
-
-```json
-{
-  "mcpServers": {
-    "abbwak": {
-      "command": "docker",
-      "args": [
-        "run", "-i", "--rm",
-        "-e", "ABBWAK_MAX_SESSIONS=5",
-        "-e", "ABBWAK_BLOCK_RESOURCES=image,font,media",
-        "abbwak", "node", "dist/cli.js", "--mcp"
-      ]
-    }
-  }
-}
+docker run -d -p 3001:3001 --name abbwak-mcp abbwak node dist/cli.js --mcp-http
 ```
 
 ### Claude Code (local npm)
@@ -129,8 +118,7 @@ Add to `.claude/settings.json`:
 {
   "mcpServers": {
     "abbwak": {
-      "command": "docker",
-      "args": ["run", "-i", "--rm", "abbwak", "node", "dist/cli.js", "--mcp"]
+      "url": "http://localhost:3001/mcp"
     }
   }
 }
@@ -587,6 +575,7 @@ All configuration via environment variables:
 | `ABBWAK_VIEWPORT_WIDTH` | int | `1280` | Default viewport width |
 | `ABBWAK_VIEWPORT_HEIGHT` | int | `720` | Default viewport height |
 | `ABBWAK_EXECUTABLE_PATH` | string | (auto) | Custom browser executable path |
+| `ABBWAK_MCP_PORT` | int | `3001` | MCP HTTP server port |
 | `ABBWAK_LOG_LEVEL` | string | `info` | Log level: `silent`, `debug`, `info`, `warn`, `error` |
 
 ---
@@ -597,42 +586,65 @@ All configuration via environment variables:
 
 ```bash
 docker build -t abbwak .
+
+# REST API server
 docker run -p 3000:3000 abbwak
+
+# MCP server (HTTP transport)
+docker run -d -p 3001:3001 abbwak node dist/cli.js --mcp-http
 ```
 
 ### Docker Compose
 
 ```bash
 # REST API server (default)
-docker compose up        # Start
-docker compose up -d     # Start detached
-docker compose down      # Stop
+docker compose up abbwak         # Start REST API on port 3000
+docker compose up -d abbwak      # Start detached
 
-# MCP server (stdio transport)
-docker compose run --rm abbwak-mcp
+# MCP server (HTTP transport)
+docker compose up abbwak-mcp     # Start MCP on port 3001
+docker compose up -d abbwak-mcp  # Start detached
+
+# Both services
+docker compose up -d             # Start everything
+
+docker compose down              # Stop all
 ```
 
 The `docker-compose.yml` includes two services:
-- **`abbwak`** — REST API server on port 3000 (default)
-- **`abbwak-mcp`** — MCP server with stdio transport for Claude Desktop/Code
+- **`abbwak`** — REST API server on port 3000
+- **`abbwak-mcp`** — MCP server on port 3001 (Streamable HTTP transport)
 
-### MCP mode in Docker
+### Connecting Claude Desktop to Docker MCP
 
-For standalone Docker (without Compose):
+1. Start the MCP container:
+   ```bash
+   docker compose up -d abbwak-mcp
+   ```
 
-```bash
-# Interactive MCP session (for testing)
-docker run -i --rm abbwak node dist/cli.js --mcp
+2. Add to Claude Desktop config (`claude_desktop_config.json`):
+   ```json
+   {
+     "mcpServers": {
+       "abbwak": {
+         "url": "http://localhost:3001/mcp"
+       }
+     }
+   }
+   ```
 
-# With environment variables
-docker run -i --rm \
-  -e ABBWAK_MAX_SESSIONS=5 \
-  -e ABBWAK_BLOCK_RESOURCES=image,font,media \
-  -e ABBWAK_ALLOWED_DOMAINS=github.com,docs.python.org \
-  abbwak node dist/cli.js --mcp
-```
+3. Restart Claude Desktop — abbwak tools will appear automatically.
 
-To connect Claude Desktop to Docker MCP, see the [MCP Setup](#mcp-setup-claude-desktop--claude-code) section above.
+### MCP Transport Modes
+
+abbwak supports two MCP transport modes:
+
+| Mode | Flag | Use case |
+|------|------|----------|
+| **stdio** | `--mcp` | Local: Claude Desktop launches the process directly |
+| **HTTP** | `--mcp-http` | Remote/Docker: long-lived server, clients connect via HTTP |
+
+The HTTP transport uses the MCP [Streamable HTTP](https://spec.modelcontextprotocol.io/specification/2025-03-26/basic/transports/#streamable-http) protocol. It supports multiple concurrent client sessions, each with their own browser sessions.
 
 ### Image details
 

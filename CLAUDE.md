@@ -175,6 +175,7 @@ SKIP_HEAVY_BROWSER_TESTS=1 npm test   # Skip click/type (OOM in low-memory CI)
 | `ABBWAK_VIEWPORT_WIDTH` | `1280` | Viewport width |
 | `ABBWAK_VIEWPORT_HEIGHT` | `720` | Viewport height |
 | `ABBWAK_EXECUTABLE_PATH` | (auto) | Custom browser path |
+| `ABBWAK_MCP_PORT` | `3001` | MCP HTTP server port |
 | `ABBWAK_LOG_LEVEL` | `info` | Log level |
 
 ## HTTP Routes Summary
