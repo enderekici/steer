@@ -5,8 +5,11 @@
  * Run standalone:  npx tsx src/mcp/server.ts
  */
 
+import { randomUUID } from 'node:crypto';
+import http from 'node:http';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
 import { executeAction, executeNavigate } from '../actions/index.js';
@@ -42,13 +45,17 @@ export class McpBrowserServer {
   // ── Handlers ────────────────────────────────────────────────────────────
 
   private registerHandlers(): void {
+    this.registerHandlersOn(this.server);
+  }
+
+  private registerHandlersOn(target: Server): void {
     // List available tools
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    target.setRequestHandler(ListToolsRequestSchema, async () => ({
       tools: [...TOOLS],
     }));
 
     // Execute a tool
-    this.server.setRequestHandler(
+    target.setRequestHandler(
       CallToolRequestSchema,
       async (request): Promise<Record<string, unknown>> => {
         const { name, arguments: args } = request.params;
@@ -227,15 +234,103 @@ export class McpBrowserServer {
 
   // ── Lifecycle ───────────────────────────────────────────────────────────
 
-  async start(): Promise<void> {
-    // Launch the browser engine
+  async startStdio(): Promise<void> {
     await this.engine.launch({ headless: true });
-
-    // Connect via stdio transport
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-
     logger.info('MCP server started (stdio transport)');
+  }
+
+  async startHttp(port: number, host: string): Promise<http.Server> {
+    await this.engine.launch({ headless: true });
+
+    const transports = new Map<string, StreamableHTTPServerTransport>();
+
+    const httpServer = http.createServer(async (req, res) => {
+      const url = new URL(req.url || '/', `http://${req.headers.host}`);
+
+      // Health check
+      if (url.pathname === '/health' && req.method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'ok', transport: 'streamable-http' }));
+        return;
+      }
+
+      // MCP endpoint
+      if (url.pathname === '/mcp') {
+        // CORS headers for browser-based clients
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, mcp-session-id');
+        res.setHeader('Access-Control-Expose-Headers', 'mcp-session-id');
+
+        if (req.method === 'OPTIONS') {
+          res.writeHead(204);
+          res.end();
+          return;
+        }
+
+        // Look up existing session transport
+        const sessionId = req.headers['mcp-session-id'] as string | undefined;
+        let transport = sessionId ? transports.get(sessionId) : undefined;
+
+        // New session: create transport + connect a fresh MCP server
+        if (!transport && req.method === 'POST') {
+          const newTransport = new StreamableHTTPServerTransport({
+            sessionIdGenerator: () => randomUUID(),
+            onsessioninitialized: (id) => {
+              transports.set(id, newTransport);
+              logger.info({ sessionId: id }, 'MCP HTTP session created');
+            },
+          });
+
+          newTransport.onclose = () => {
+            const id = newTransport.sessionId;
+            if (id) transports.delete(id);
+            logger.info({ sessionId: id }, 'MCP HTTP session closed');
+          };
+
+          transport = newTransport;
+
+          // Each HTTP session gets its own MCP Server + handlers
+          const sessionServer = new Server(
+            { name: 'abbwak', version: '1.0.0' },
+            { capabilities: { tools: {} } },
+          );
+          this.registerHandlersOn(sessionServer);
+          await sessionServer.connect(transport);
+        }
+
+        if (!transport) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'No valid session. Send a POST to initialize.' }));
+          return;
+        }
+
+        // Parse body for POST requests
+        let body: unknown;
+        if (req.method === 'POST') {
+          const chunks: Buffer[] = [];
+          for await (const chunk of req) {
+            chunks.push(chunk as Buffer);
+          }
+          body = JSON.parse(Buffer.concat(chunks).toString());
+        }
+
+        await transport.handleRequest(req, res, body);
+        return;
+      }
+
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Not found' }));
+    });
+
+    return new Promise((resolve) => {
+      httpServer.listen(port, host, () => {
+        logger.info({ port, host }, 'MCP server started (Streamable HTTP transport)');
+        resolve(httpServer);
+      });
+    });
   }
 
   async stop(): Promise<void> {
@@ -274,7 +369,6 @@ function errorContent(message: string): ToolResponse {
 export async function startMcpServer(): Promise<McpBrowserServer> {
   const server = new McpBrowserServer();
 
-  // Graceful shutdown
   const shutdown = async () => {
     await server.stop();
     process.exit(0);
@@ -283,8 +377,27 @@ export async function startMcpServer(): Promise<McpBrowserServer> {
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
 
-  await server.start();
+  await server.startStdio();
   return server;
+}
+
+export async function startMcpHttpServer(
+  port: number,
+  host: string,
+): Promise<{ mcpServer: McpBrowserServer; httpServer: http.Server }> {
+  const mcpServer = new McpBrowserServer();
+
+  const shutdown = async () => {
+    httpServer.close();
+    await mcpServer.stop();
+    process.exit(0);
+  };
+
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
+
+  const httpServer = await mcpServer.startHttp(port, host);
+  return { mcpServer, httpServer };
 }
 
 // ---------------------------------------------------------------------------

@@ -19,6 +19,8 @@
     "start:dev": "tsx src/index.ts",
     "mcp": "node dist/mcp/server.js",
     "mcp:dev": "tsx src/mcp/server.ts",
+    "mcp:http": "node dist/cli.js --mcp-http",
+    "mcp:http:dev": "tsx src/cli.ts --mcp-http",
     "build": "tsup src/index.ts src/cli.ts src/mcp/server.ts --format esm --dts --clean",
     "prepublishOnly": "npm run build",
     "test": "vitest run",
