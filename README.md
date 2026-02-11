@@ -648,7 +648,7 @@ The HTTP transport uses the MCP [Streamable HTTP](https://spec.modelcontextproto
 
 ### Image details
 
-- Base: `mcr.microsoft.com/playwright:v1.56.1-noble`
+- Base: `mcr.microsoft.com/playwright:v1.58.2-noble`
 - Browser: Firefox only (~400MB lighter than all browsers)
 - Memory: 2GB limit, 512MB reservation
 - Healthcheck: `GET /health` every 30s

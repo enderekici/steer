@@ -107,7 +107,7 @@ SKIP_HEAVY_BROWSER_TESTS=1 npm test   # Skip click/type (OOM in low-memory CI)
 
 - **Linter:** Biome (`biome.json`)
 - **Indent:** 2 spaces
-- **Quotes:** Single quotes (configured in biome, but codebase uses double — follow existing file convention)
+- **Quotes:** Single quotes
 - **Semicolons:** Always
 - **Line width:** 100
 - **Imports:** Auto-organized by Biome
@@ -206,10 +206,16 @@ SKIP_HEAVY_BROWSER_TESTS=1 npm test   # Skip click/type (OOM in low-memory CI)
 
 **Runtime:** playwright, fastify, @fastify/cors, @fastify/rate-limit, @modelcontextprotocol/sdk, @mozilla/readability, linkedom, turndown, pino, pino-pretty, nanoid, zod
 
-**Dev:** typescript, tsx, tsup, vitest, biome, @biomejs/biome, @types/node, @types/turndown
+**Dev:** typescript, tsx, tsup, vitest, @biomejs/biome, @vitest/coverage-v8, @vitest/ui, @types/node, @types/turndown
 
 ## Documentation
 
 - `README.md` — User guide (setup, API reference, examples, config, Docker)
 - `ARCHITECTURE.md` — Technical deep-dive (system diagram, algorithms, design decisions)
 - `ROADMAP.md` — Planned features and known gaps
+- `QUICKSTART.md` — 5-minute setup guide
+- `EXAMPLES.md` — REST API and MCP usage examples
+- `TESTING.md` — Test structure, running, writing tests
+- `DOCKER.md` — Docker deployment guide
+- `CONTRIBUTING.md` — Contributing guidelines
+- `CHANGELOG.md` — Version history

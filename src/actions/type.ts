@@ -20,7 +20,7 @@ export async function executeType(
   try {
     await withRetry(
       async () => {
-        await element.scrollIntoViewIfNeeded().catch(() => {});
+        await element.scrollIntoViewIfNeeded().catch(() => undefined);
         await element.click({ timeout: 5000 });
 
         const editable = await isContentEditable(element);

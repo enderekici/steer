@@ -73,7 +73,7 @@ heavyDescribe('executeType', () => {
       id: 'test-session',
       page,
       refs,
-      touch: () => {},
+      touch: () => undefined,
       getElementByRef: (r: string) => refs.get(r),
     } as unknown as Session;
   }
@@ -93,7 +93,7 @@ heavyDescribe('executeType', () => {
   });
 
   afterEach(async () => {
-    await context?.close().catch(() => {});
+    await context?.close().catch(() => undefined);
   });
 
   it('should type into text field using ref', async () => {
@@ -127,7 +127,7 @@ heavyDescribe('executeClick', () => {
       id: 'test-session',
       page,
       refs,
-      touch: () => {},
+      touch: () => undefined,
       getElementByRef: (r: string) => refs.get(r),
     } as unknown as Session;
   }
@@ -147,7 +147,7 @@ heavyDescribe('executeClick', () => {
   });
 
   afterEach(async () => {
-    await context?.close().catch(() => {});
+    await context?.close().catch(() => undefined);
   });
 
   it('should click button by ref', async () => {
@@ -184,7 +184,7 @@ describe('executeScroll', () => {
       id: 'test-session',
       page,
       refs,
-      touch: () => {},
+      touch: () => undefined,
       getElementByRef: (r: string) => refs.get(r),
     } as unknown as Session;
   }
@@ -204,7 +204,7 @@ describe('executeScroll', () => {
   });
 
   afterEach(async () => {
-    await context?.close().catch(() => {});
+    await context?.close().catch(() => undefined);
   });
 
   it('should scroll down', async () => {
@@ -231,7 +231,7 @@ describe('executeSelect', () => {
       id: 'test-session',
       page,
       refs,
-      touch: () => {},
+      touch: () => undefined,
       getElementByRef: (r: string) => refs.get(r),
     } as unknown as Session;
   }
@@ -251,7 +251,7 @@ describe('executeSelect', () => {
   });
 
   afterEach(async () => {
-    await context?.close().catch(() => {});
+    await context?.close().catch(() => undefined);
   });
 
   it('should select option by ref', async () => {
@@ -281,7 +281,7 @@ describe('executeAction dispatcher', () => {
       id: 'test-session',
       page,
       refs,
-      touch: () => {},
+      touch: () => undefined,
       getElementByRef: (r: string) => refs.get(r),
     } as unknown as Session;
   }
@@ -301,7 +301,7 @@ describe('executeAction dispatcher', () => {
   });
 
   afterEach(async () => {
-    await context?.close().catch(() => {});
+    await context?.close().catch(() => undefined);
   });
 
   it.skipIf(SKIP_HEAVY)('should dispatch click', async () => {

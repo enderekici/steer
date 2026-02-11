@@ -108,7 +108,7 @@ A **self-hosted, zero-cost, language-agnostic HTTP API** that wraps a headless b
 
 | Layer | Technology | Why |
 |---|---|---|
-| **Runtime** | Node.js 20+ | Playwright's native environment, async I/O |
+| **Runtime** | Node.js 24+ | Playwright's native environment, async I/O |
 | **Language** | TypeScript | Type safety, better DX, self-documenting |
 | **HTTP Server** | Fastify | Fastest Node framework, JSON schema validation |
 | **Browser Engine** | Playwright | Multi-browser, CDP access, best API |

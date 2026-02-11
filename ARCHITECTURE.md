@@ -427,7 +427,7 @@ npm run mcp         # node dist/mcp/server.js
 ### Docker Build
 
 Two-stage:
-1. **Builder** (node:20-slim): `npm ci` + `npm run build` → produces `dist/`
+1. **Builder** (node:24-slim): `npm ci` + `npm run build` → produces `dist/`
 2. **Production** (playwright:noble): `npm ci --omit=dev` + copy `dist/`, install Firefox only
 
 ---

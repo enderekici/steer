@@ -10,7 +10,7 @@ export async function executeClick(session: Session, target: ActionTarget): Prom
   try {
     await withRetry(
       async () => {
-        await element.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {});
+        await element.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => undefined);
         await element
           .click({ timeout: 3000 })
           .catch(() => element.click({ force: true, timeout: 3000 }));
@@ -18,7 +18,9 @@ export async function executeClick(session: Session, target: ActionTarget): Prom
       { retries: 1, actionName: 'click' },
     );
 
-    await session.page.waitForLoadState('domcontentloaded', { timeout: 3000 }).catch(() => {});
+    await session.page
+      .waitForLoadState('domcontentloaded', { timeout: 3000 })
+      .catch(() => undefined);
   } catch (err) {
     if (err instanceof ActionError) throw err;
     const message = err instanceof Error ? err.message : String(err);

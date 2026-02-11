@@ -1,18 +1,58 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": ["**", "!**/node_modules", "!**/dist", "!**/*.min.js"]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 100,
+    "attributePosition": "auto"
+  },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
       "correctness": {
-        "noUnusedImports": "warn"
+        "noUnusedVariables": "error"
+      },
+      "style": {
+        "useConst": "error",
+        "useTemplate": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noEmptyBlockStatements": "error",
+        "noVar": "error"
       }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "always",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "bracketSameLine": false,
+      "quoteStyle": "single",
+      "attributePosition": "auto"
     }
   },
   "overrides": [
     {
-      "includes": ["**/test/**/*.ts"],
+      "includes": ["**/test/**/*.ts", "**/*.test.ts", "**/*.spec.ts"],
       "linter": {
         "rules": {
           "suspicious": {
@@ -21,17 +61,5 @@
         }
       }
     }
-  ],
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space",
-    "indentWidth": 2,
-    "lineWidth": 100
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "single",
-      "semicolons": "always"
-    }
-  }
+  ]
 }

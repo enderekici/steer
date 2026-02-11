@@ -8,7 +8,7 @@ export async function executeHover(session: Session, target: ActionTarget): Prom
   const element = await resolveElement(session, target, 'hover');
 
   try {
-    await element.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {});
+    await element.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => undefined);
     await element.hover({ timeout: 3000 });
 
     // Brief wait for hover-triggered content (menus, tooltips)

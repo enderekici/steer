@@ -49,7 +49,9 @@ export async function executeKeyboard(session: Session, key: string): Promise<Ac
   try {
     await session.page.keyboard.press(key);
 
-    await session.page.waitForLoadState('domcontentloaded', { timeout: 2000 }).catch(() => {});
+    await session.page
+      .waitForLoadState('domcontentloaded', { timeout: 2000 })
+      .catch(() => undefined);
   } catch (err) {
     if (err instanceof ActionError) throw err;
     const message = err instanceof Error ? err.message : String(err);

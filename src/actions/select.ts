@@ -64,7 +64,7 @@ export async function executeSelect(
     } else {
       logger.info({ sessionId: session.id, value }, 'Handling custom dropdown select');
 
-      await element.scrollIntoViewIfNeeded().catch(() => {});
+      await element.scrollIntoViewIfNeeded().catch(() => undefined);
       await element.click({ timeout: 5000 });
       await session.page.waitForTimeout(300);
 
@@ -95,7 +95,9 @@ export async function executeSelect(
       }
     }
 
-    await session.page.waitForLoadState('domcontentloaded', { timeout: 3000 }).catch(() => {});
+    await session.page
+      .waitForLoadState('domcontentloaded', { timeout: 3000 })
+      .catch(() => undefined);
   } catch (err) {
     if (err instanceof ActionError) throw err;
     const message = err instanceof Error ? err.message : String(err);
