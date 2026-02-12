@@ -211,9 +211,9 @@ Run multiple browser instances for high-throughput.
 TypeScript SDK for building agents on top of steer.
 
 ```typescript
-import { AbbwakClient } from "steer/client";
+import { SteerClient } from "steer/client";
 
-const browser = new AbbwakClient("http://localhost:3000");
+const browser = new SteerClient("http://localhost:3000");
 const session = await browser.createSession();
 await session.navigate("https://example.com");
 const results = await session.observe({ verbosity: "minimal" });

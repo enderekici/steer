@@ -6,6 +6,7 @@ import TurndownModule from 'turndown';
 
 import { ValidationError } from '../utils/errors.js';
 import { logger } from '../utils/logger.js';
+import { sanitizeSelector } from '../utils/sanitize.js';
 
 const TurndownService =
   (TurndownModule as unknown as { default?: typeof TurndownModule }).default ?? TurndownModule;
@@ -451,26 +452,24 @@ export async function extractContent(page: Page, options: ExtractOptions): Promi
   const maxLength = options.maxLength ?? DEFAULT_MAX_LENGTH;
   const url = page.url();
 
-  logger.debug({ mode: options.mode, selector: options.selector }, 'extractContent');
+  // Sanitize selector before passing to Playwright
+  const selector = options.selector ? sanitizeSelector(options.selector) : undefined;
+
+  logger.debug({ mode: options.mode, selector }, 'extractContent');
 
   switch (options.mode) {
     case 'text': {
-      const { content, title } = await extractText(page, options.selector, maxLength);
+      const { content, title } = await extractText(page, selector, maxLength);
       return { content, url, title };
     }
 
     case 'markdown': {
-      const { content, title } = await extractMarkdown(page, options.selector, maxLength);
+      const { content, title } = await extractMarkdown(page, selector, maxLength);
       return { content, url, title };
     }
 
     case 'structured': {
-      const { content, title } = await extractStructured(
-        page,
-        options.selector,
-        options.schema,
-        maxLength,
-      );
+      const { content, title } = await extractStructured(page, selector, options.schema, maxLength);
       return { content, url, title };
     }
 

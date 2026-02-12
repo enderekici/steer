@@ -6,7 +6,6 @@ import {
   ActionError,
   AppError,
   DomainNotAllowedError,
-  NavigationError,
   SessionLimitError,
   SessionNotFoundError,
   ValidationError,
@@ -43,28 +42,6 @@ describe('SessionLimitError', () => {
     expect(err.message).toContain('10');
     expect(err.name).toBe('SessionLimitError');
     expect(err).toBeInstanceOf(AppError);
-  });
-});
-
-describe('NavigationError', () => {
-  it('should have statusCode 502 and NAVIGATION_FAILED code', () => {
-    const err = new NavigationError('https://example.com');
-    expect(err.statusCode).toBe(502);
-    expect(err.code).toBe('NAVIGATION_FAILED');
-    expect(err.message).toContain('https://example.com');
-    expect(err.name).toBe('NavigationError');
-    expect(err).toBeInstanceOf(AppError);
-  });
-
-  it('should include optional reason in message', () => {
-    const err = new NavigationError('https://example.com', 'timeout');
-    expect(err.message).toContain('timeout');
-    expect(err.message).toContain('https://example.com');
-  });
-
-  it('should omit reason detail when reason is not provided', () => {
-    const err = new NavigationError('https://example.com');
-    expect(err.message).toBe('Navigation failed for https://example.com');
   });
 });
 

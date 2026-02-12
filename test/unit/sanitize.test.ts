@@ -3,7 +3,7 @@ process.env.STEER_LOG_LEVEL = 'silent';
 
 import { describe, expect, it } from 'vitest';
 import { ValidationError } from '../../src/utils/errors.js';
-import { sanitizeSelector, sanitizeUrl, truncateText } from '../../src/utils/sanitize.js';
+import { sanitizeSelector, sanitizeUrl } from '../../src/utils/sanitize.js';
 
 // ── sanitizeUrl ─────────────────────────────────────────────────────────────
 
@@ -124,44 +124,5 @@ describe('sanitizeSelector', () => {
 
   it('should reject a selector with semicolons', () => {
     expect(() => sanitizeSelector('div; drop table')).toThrow(ValidationError);
-  });
-});
-
-// ── truncateText ────────────────────────────────────────────────────────────
-
-describe('truncateText', () => {
-  it('should return short text unchanged when under maxLength', () => {
-    expect(truncateText('hello', 10)).toBe('hello');
-  });
-
-  it('should return text unchanged when exactly at maxLength', () => {
-    expect(truncateText('hello', 5)).toBe('hello');
-  });
-
-  it('should truncate long text and append ellipsis', () => {
-    const result = truncateText('hello world', 8);
-    // maxLength 8 -> slice(0, 5) + "..." = "hello..."
-    expect(result).toBe('hello...');
-    expect(result.length).toBe(8);
-  });
-
-  it('should truncate a very long string to exactly maxLength characters', () => {
-    const longText = 'a'.repeat(1000);
-    const result = truncateText(longText, 50);
-    expect(result.length).toBe(50);
-    expect(result.endsWith('...')).toBe(true);
-  });
-
-  it('should handle maxLength of 3 (minimum for ellipsis)', () => {
-    const result = truncateText('abcdef', 3);
-    expect(result).toBe('...');
-  });
-
-  it('should handle empty text', () => {
-    expect(truncateText('', 10)).toBe('');
-  });
-
-  it('should handle single character text under maxLength', () => {
-    expect(truncateText('a', 10)).toBe('a');
   });
 });

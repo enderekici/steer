@@ -3,16 +3,6 @@ import fp from 'fastify-plugin';
 import { config } from '../../config.js';
 import { logger } from '../../utils/logger.js';
 
-class RequestTimeoutError extends Error {
-  readonly statusCode = 504;
-  readonly code = 'REQUEST_TIMEOUT';
-
-  constructor(timeoutMs: number) {
-    super(`Request timed out after ${timeoutMs}ms`);
-    this.name = 'RequestTimeoutError';
-  }
-}
-
 async function requestTimeoutPlugin(fastify: FastifyInstance): Promise<void> {
   const timeoutMs = config.requestTimeoutMs;
 
@@ -39,5 +29,3 @@ async function requestTimeoutPlugin(fastify: FastifyInstance): Promise<void> {
 export default fp(requestTimeoutPlugin, {
   name: 'request-timeout',
 });
-
-export { RequestTimeoutError };

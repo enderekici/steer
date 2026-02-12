@@ -75,4 +75,43 @@ describe('withRetry', () => {
     await expect(withRetry(fn, { retries: 0 })).rejects.toThrow('Timeout');
     expect(fn).toHaveBeenCalledTimes(1);
   });
+
+  it('should use default retries (1) when not specified', async () => {
+    const fn = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('Timeout occurred'))
+      .mockResolvedValueOnce('ok');
+
+    const result = await withRetry(fn);
+    expect(result).toBe('ok');
+    expect(fn).toHaveBeenCalledTimes(2);
+  });
+
+  it('should use default actionName when not specified', async () => {
+    const fn = vi.fn().mockRejectedValue(new Error('permanent'));
+
+    await expect(withRetry(fn)).rejects.toThrow('permanent');
+  });
+
+  it('should handle non-Error throws during retry', async () => {
+    const fn = vi.fn().mockRejectedValue('string error');
+
+    await expect(withRetry(fn, { retries: 1 })).rejects.toBe('string error');
+    expect(fn).toHaveBeenCalledTimes(1); // Not transient, so no retry
+  });
+
+  it('should retry on transient non-Error throws and convert to Error', async () => {
+    let callCount = 0;
+    const fn = vi.fn().mockImplementation(() => {
+      callCount++;
+      if (callCount === 1) {
+        return Promise.reject('Timeout in operation');
+      }
+      return Promise.resolve('ok');
+    });
+
+    const result = await withRetry(fn, { retries: 1 });
+    expect(result).toBe('ok');
+    expect(fn).toHaveBeenCalledTimes(2);
+  });
 });

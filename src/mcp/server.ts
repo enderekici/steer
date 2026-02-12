@@ -7,6 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import http from 'node:http';
+import { createRequire } from 'node:module';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
@@ -16,11 +17,15 @@ import { executeAction, executeNavigate } from '../actions/index.js';
 import { BrowserEngine } from '../browser/engine.js';
 import type { Session } from '../browser/session.js';
 import { SessionManager } from '../browser/session-manager.js';
+import { config } from '../config.js';
 import type { ExtractOptions } from '../processing/content.js';
 import { extractContent } from '../processing/content.js';
 import { formatSnapshot, takeSnapshot } from '../processing/snapshot.js';
 import { logger } from '../utils/logger.js';
 import { TOOLS } from './tools.js';
+
+const require = createRequire(import.meta.url);
+const { version } = require('../../package.json') as { version: string };
 
 // ---------------------------------------------------------------------------
 // Server class
@@ -36,7 +41,7 @@ export class McpBrowserServer {
     this.engine = new BrowserEngine();
     this.sessions = new SessionManager(this.engine);
 
-    this.server = new Server({ name: 'steer', version: '1.0.0' }, { capabilities: { tools: {} } });
+    this.server = new Server({ name: 'steer', version }, { capabilities: { tools: {} } });
 
     this.registerHandlers();
   }
@@ -258,7 +263,7 @@ export class McpBrowserServer {
       // MCP endpoint
       if (url.pathname === '/mcp') {
         // CORS headers for browser-based clients
-        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Origin', config.corsOrigin);
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type, mcp-session-id');
         res.setHeader('Access-Control-Expose-Headers', 'mcp-session-id');
@@ -293,7 +298,7 @@ export class McpBrowserServer {
 
           // Each HTTP session gets its own MCP Server + handlers
           const sessionServer = new Server(
-            { name: 'steer', version: '1.0.0' },
+            { name: 'steer', version },
             { capabilities: { tools: {} } },
           );
           this.registerHandlersOn(sessionServer);
@@ -309,8 +314,16 @@ export class McpBrowserServer {
         // Parse body for POST requests
         let body: unknown;
         if (req.method === 'POST') {
+          const MAX_BODY_SIZE = 1024 * 1024; // 1MB
           const chunks: Buffer[] = [];
+          let totalSize = 0;
           for await (const chunk of req) {
+            totalSize += chunk.length;
+            if (totalSize > MAX_BODY_SIZE) {
+              res.writeHead(413);
+              res.end(JSON.stringify({ error: 'Request body too large' }));
+              return;
+            }
             chunks.push(chunk as Buffer);
           }
           body = JSON.parse(Buffer.concat(chunks).toString());

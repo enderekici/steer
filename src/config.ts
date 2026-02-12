@@ -44,6 +44,7 @@ export const config = {
   browser: envBrowser('STEER_BROWSER', 'firefox'),
   viewportWidth: envInt('STEER_VIEWPORT_WIDTH', 1280),
   viewportHeight: envInt('STEER_VIEWPORT_HEIGHT', 720),
+  corsOrigin: env('STEER_CORS_ORIGIN', 'http://localhost:*'),
 } as const;
 
 export type Config = typeof config;

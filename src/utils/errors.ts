@@ -22,13 +22,6 @@ export class SessionLimitError extends AppError {
   }
 }
 
-export class NavigationError extends AppError {
-  constructor(url: string, reason?: string) {
-    const detail = reason ? `: ${reason}` : '';
-    super(`Navigation failed for ${url}${detail}`, 502, 'NAVIGATION_FAILED');
-  }
-}
-
 export class ActionError extends AppError {
   constructor(action: string, reason?: string) {
     const detail = reason ? `: ${reason}` : '';

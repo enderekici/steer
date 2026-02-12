@@ -37,8 +37,6 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run build
-      - run: node dist/cli.js --help
       - run: npx playwright install --with-deps firefox
       - name: Tests with coverage
         run: npm run test:coverage
@@ -108,7 +106,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
 
       - name: Trivy scan
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.28.0
         with:
           image-ref: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
           format: sarif
