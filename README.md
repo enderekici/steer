@@ -1,5 +1,12 @@
 # steer
 
+[![CI](https://github.com/enderekici/steer/actions/workflows/ci.yml/badge.svg)](https://github.com/enderekici/steer/actions/workflows/ci.yml)
+![Docker](https://img.shields.io/badge/docker-ready-blue?logo=docker)
+![Node.js](https://img.shields.io/badge/node-%3E%3D24-green?logo=node.js)
+![TypeScript](https://img.shields.io/badge/typescript-5.9-blue?logo=typescript)
+![Playwright](https://img.shields.io/badge/playwright-1.58-green?logo=playwright)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 **API-Based Browser Without API Key** — A free, open-source headless browser designed for AI agents.
 
 No API keys. No paid services. Just a powerful, self-hosted browser that agents can control via REST API or MCP.
