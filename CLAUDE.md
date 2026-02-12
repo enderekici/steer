@@ -102,6 +102,7 @@ SKIP_HEAVY_BROWSER_TESTS=1 npm test   # Skip click/type (OOM in low-memory CI)
 - Chromium/Firefox crash under heavy load (click/type tests timeout)
 - Use `SKIP_HEAVY_BROWSER_TESTS=1` to skip flaky browser action tests
 - Use `STEER_EXECUTABLE_PATH` env var if browser binary is in a non-standard location
+- Firefox requires writable cache directories; Dockerfile sets `XDG_CACHE_HOME=/tmp/firefox-cache` and `MOZ_DISABLE_CONTENT_SANDBOX=1` to avoid launch failures
 
 ## Code Style
 

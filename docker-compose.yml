@@ -20,7 +20,7 @@ services:
       - no-new-privileges:true
     read_only: true
     tmpfs:
-      - /tmp:noexec,nosuid,size=64m
+      - /tmp:nosuid,size=256m
     logging:
       driver: "json-file"
       options:
@@ -56,7 +56,7 @@ services:
       - no-new-privileges:true
     read_only: true
     tmpfs:
-      - /tmp:noexec,nosuid,size=64m
+      - /tmp:nosuid,size=256m
     logging:
       driver: "json-file"
       options:

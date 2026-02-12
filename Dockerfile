@@ -22,7 +22,7 @@ WORKDIR /app
 
 # Create non-root user (use high IDs to avoid conflicts with base image)
 RUN groupadd -g 10001 steer && \
-    useradd -u 10001 -g steer -s /bin/bash steer
+    useradd -u 10001 -g steer -s /bin/bash -m steer
 
 # Base image already includes all browsers at /ms-playwright/
 COPY package.json package-lock.json ./
@@ -30,8 +30,10 @@ RUN npm ci --omit=dev --ignore-scripts
 
 COPY --from=builder /app/dist/ dist/
 
-# Set ownership
-RUN chown -R steer:steer /app
+# Create writable cache directories for Firefox
+RUN mkdir -p /home/steer/.cache && \
+    mkdir -p /tmp/firefox-cache && \
+    chown -R steer:steer /app /home/steer/.cache /tmp/firefox-cache
 
 # Switch to non-root user
 USER steer
@@ -41,6 +43,12 @@ ENV STEER_HEADLESS=true
 ENV STEER_HOST=0.0.0.0
 ENV STEER_PORT=3000
 ENV STEER_BROWSER=firefox
+
+# Firefox-specific environment variables for Docker
+ENV HOME=/home/steer
+ENV XDG_CACHE_HOME=/tmp/firefox-cache
+ENV DCONF_PROFILE=
+ENV MOZ_DISABLE_CONTENT_SANDBOX=1
 
 EXPOSE 3000
 

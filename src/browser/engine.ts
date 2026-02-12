@@ -40,10 +40,35 @@ export class BrowserEngine {
 
     const executablePath = process.env.STEER_EXECUTABLE_PATH || undefined;
 
+    // Firefox-specific args for Docker environments
+    const firefoxArgs =
+      browserName === 'firefox'
+        ? [
+            '--no-sandbox',
+            '--disable-gpu',
+            '--disable-dev-shm-usage',
+            '-silent', // Suppress startup messages
+          ]
+        : ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'];
+
+    // Firefox-specific environment variables
+    const firefoxEnv =
+      browserName === 'firefox'
+        ? {
+            // Use tmp directory for cache to avoid read-only filesystem issues
+            XDG_CACHE_HOME: process.env.XDG_CACHE_HOME || '/tmp/firefox-cache',
+            // Disable dconf to avoid cache directory errors
+            DCONF_PROFILE: '',
+            // Suppress fontconfig warnings
+            FONTCONFIG_PATH: '/etc/fonts',
+          }
+        : {};
+
     this.browser = await browserType.launch({
       headless,
       executablePath,
-      args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
+      args: firefoxArgs,
+      env: firefoxEnv,
     });
 
     this.browser.on('disconnected', () => {
