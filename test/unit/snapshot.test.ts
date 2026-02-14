@@ -133,7 +133,10 @@ describe('takeSnapshot', () => {
     return {
       url: vi.fn().mockReturnValue('http://test.com'),
       title: vi.fn().mockResolvedValue('Test Page'),
-      evaluate: vi.fn().mockResolvedValueOnce(rawElements),
+      // First evaluate call is the __name shim (string), second is the snapshot
+      evaluate: vi.fn()
+        .mockResolvedValueOnce(undefined)
+        .mockResolvedValueOnce(rawElements),
       $: vi.fn().mockResolvedValue({ mock: true }),
     } as any;
   }
@@ -398,7 +401,8 @@ describe('takeSnapshot', () => {
     const page = createMockPage([]);
     await takeSnapshot(page, { scope: '#main' });
 
-    const evaluateArgs = page.evaluate.mock.calls[0][1];
+    // calls[0] is the __name shim, calls[1] is the snapshot evaluate
+    const evaluateArgs = page.evaluate.mock.calls[1][1];
     expect(evaluateArgs.scopeSelector).toBe('#main');
   });
 
@@ -406,7 +410,8 @@ describe('takeSnapshot', () => {
     const page = createMockPage([]);
     await takeSnapshot(page, { maxRefs: 5 });
 
-    const evaluateArgs = page.evaluate.mock.calls[0][1];
+    // calls[0] is the __name shim, calls[1] is the snapshot evaluate
+    const evaluateArgs = page.evaluate.mock.calls[1][1];
     expect(evaluateArgs.maxRefsLimit).toBe(5);
   });
 
