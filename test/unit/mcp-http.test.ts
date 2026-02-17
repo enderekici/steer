@@ -117,7 +117,7 @@ function httpGet(url: string): Promise<{ statusCode: number; body: string }> {
         res.on('data', (chunk) => {
           body += chunk;
         });
-        res.on('end', () => resolve({ statusCode: res.statusCode!, body }));
+        res.on('end', () => resolve({ statusCode: res.statusCode ?? 0, body }));
       })
       .on('error', reject);
   });
@@ -148,7 +148,7 @@ function httpRequest(
           responseBody += chunk;
         });
         res.on('end', () =>
-          resolve({ statusCode: res.statusCode!, body: responseBody, headers: res.headers }),
+          resolve({ statusCode: res.statusCode ?? 0, body: responseBody, headers: res.headers }),
         );
       },
     );

@@ -86,7 +86,7 @@ vi.mock('../../src/processing/content.js', () => ({
 
 vi.mock('@modelcontextprotocol/sdk/server/index.js', () => {
   class MockServer {
-    setRequestHandler = vi.fn((schema: string, handler: Function) => {
+    setRequestHandler = vi.fn((schema: string, handler: (...args: never) => unknown) => {
       if (schema === 'CallToolRequestSchema') {
         callToolHandler = handler as any;
       } else if (schema === 'ListToolsRequestSchema') {
@@ -129,7 +129,11 @@ describe('MCP tool handlers', () => {
   async function createServerAndGetHandlers() {
     const server = new McpBrowserServer();
     // The handlers are registered in the constructor via registerHandlers
-    return { server, callToolHandler: callToolHandler!, listToolsHandler: listToolsHandler! };
+    return {
+      server,
+      callToolHandler: callToolHandler as typeof callToolHandler,
+      listToolsHandler: listToolsHandler as typeof listToolsHandler,
+    };
   }
 
   describe('ListTools', () => {

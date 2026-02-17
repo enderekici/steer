@@ -16,7 +16,7 @@ function createMockPage(opts: Record<string, any> = {}) {
       ? vi.fn().mockRejectedValue(new Error('no title'))
       : vi.fn().mockResolvedValue(opts.title ?? 'Test'),
     content: vi.fn().mockResolvedValue(opts.content ?? '<body></body>'),
-    $eval: vi.fn().mockImplementation(async (_sel: string, _fn: Function) => {
+    $eval: vi.fn().mockImplementation(async (_sel: string, _fn: (...args: never) => unknown) => {
       if (opts.evalReturn !== undefined) return opts.evalReturn;
       return opts.content ?? '<body></body>';
     }),
@@ -60,7 +60,7 @@ describe('content helpers via extractContent', () => {
       const page = createMockPage({
         innerText: 'Fallback text from innerText',
       });
-      page.$eval.mockImplementation(async (_sel: string, _fn: Function) => {
+      page.$eval.mockImplementation(async (_sel: string, _fn: (...args: never) => unknown) => {
         // First call returns html (which readability can't parse)
         // Second call returns innerText
         return '<div></div>';

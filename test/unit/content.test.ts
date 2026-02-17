@@ -33,7 +33,7 @@ function createMockPage(
     url: vi.fn().mockReturnValue(url),
     title: vi.fn().mockResolvedValue(title),
     content: vi.fn().mockResolvedValue(content),
-    $eval: vi.fn().mockImplementation((_selector: string, _fn: Function) => {
+    $eval: vi.fn().mockImplementation((_selector: string, _fn: (...args: never) => unknown) => {
       if (evalThrows) throw new Error('eval failed');
       if (evalResult !== null) return Promise.resolve(evalResult);
       return Promise.resolve(content);

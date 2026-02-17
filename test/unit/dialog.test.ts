@@ -25,10 +25,10 @@ vi.mock('../../src/processing/snapshot.js', () => {
 import { executeDialogConfig, installDialogHandler } from '../../src/actions/dialog.js';
 
 function createMockSession() {
-  const listeners: Record<string, Function[]> = {};
+  const listeners: Record<string, ((...args: never) => unknown)[]> = {};
   return {
     page: {
-      on: vi.fn((event: string, handler: Function) => {
+      on: vi.fn((event: string, handler: (...args: never) => unknown) => {
         if (!listeners[event]) listeners[event] = [];
         listeners[event].push(handler);
       }),
