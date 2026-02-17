@@ -197,27 +197,26 @@ docker run -p 3010:3010 --memory=4g --cpus=4.0 steer
 
 ### Non-root user
 
-The container creates a dedicated `steer` user (UID 1001, GID 1001) and runs the application as that user. The application never runs as root.
+The container creates a dedicated `steer` user (UID 10001, GID 10001) and runs the application as that user. The application never runs as root.
 
-### Read-only filesystem
+### Temporary storage
 
-The Docker Compose configuration enables `read_only: true`, preventing the container from writing to the filesystem. A tmpfs mount at `/tmp` provides temporary storage:
+A tmpfs mount at `/tmp` provides in-memory temporary storage:
 
 ```yaml
-read_only: true
 tmpfs:
   - /tmp:nosuid,size=256m
 ```
 
-Note: The tmpfs uses `nosuid` (prevent setuid) but not `noexec`, as Firefox needs to execute temporary files during startup. The 256MB size accommodates Firefox's cache requirements (`/tmp/firefox-cache`).
+The tmpfs uses `nosuid` (prevent setuid) but not `noexec`, as Firefox needs to execute temporary files during startup. The 256MB size accommodates Firefox's cache requirements (`/tmp/firefox-cache`).
 
-### No new privileges
+### Seccomp profile
 
-The `no-new-privileges` security option prevents processes inside the container from gaining additional privileges:
+The container disables the default seccomp filter to allow the system calls required by Firefox:
 
 ```yaml
 security_opt:
-  - no-new-privileges:true
+  - seccomp=unconfined
 ```
 
 ### Log rotation
@@ -391,13 +390,13 @@ Increase the memory limit if the container is hitting its cap. Firefox needs at 
 
 **Firefox-specific cache directory issues:**
 
-Firefox requires writable cache directories. If you see errors like `unable to create directory '/home/steer/.cache/dconf': Read-only file system`, the Dockerfile has been configured to work around this by:
+Firefox requires writable cache directories. The Dockerfile is configured to redirect cache paths to `/tmp` to avoid permission issues:
 
 1. Setting `XDG_CACHE_HOME=/tmp/firefox-cache` to use a writable temp directory
 2. Setting `MOZ_DISABLE_CONTENT_SANDBOX=1` to disable content sandboxing (container provides isolation)
 3. Creating `/tmp/firefox-cache` at build time with proper ownership
 
-If you're mounting a custom read-only filesystem or restricting `/tmp`, ensure `/tmp/firefox-cache` is writable by the `steer` user (UID 10001).
+If you're restricting `/tmp` (e.g., with a smaller tmpfs or a read-only overlay), ensure `/tmp/firefox-cache` is writable by the `steer` user (UID 10001).
 
 ### Health check failing
 

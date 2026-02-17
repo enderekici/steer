@@ -55,7 +55,7 @@ export class BrowserEngine {
     const firefoxEnv =
       browserName === 'firefox'
         ? {
-            // Use tmp directory for cache to avoid read-only filesystem issues
+            // Use tmp directory for cache to avoid permission issues in containers
             XDG_CACHE_HOME: process.env.XDG_CACHE_HOME || '/tmp/firefox-cache',
             // Disable dconf to avoid cache directory errors
             DCONF_PROFILE: '',
